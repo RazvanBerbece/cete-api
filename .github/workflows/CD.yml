@@ -1,0 +1,54 @@
+# Workflow that runs on PRs and automates the integration & testing process
+name: CI
+
+on:
+  # Triggers the workflow on push events to main
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Test integration first before deploying
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Install npm packages from the package JSON file
+      - name: Install npm packages
+        run: |
+          echo Installing packages...,
+
+  test:
+
+      runs-on: ubuntu-latest
+
+      steps:
+        # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+        - uses: actions/checkout@v2
+
+        # Run the test files for the API
+        - name: Run test harness
+          run: |
+            echo Running harness...,
+
+  deploy:
+
+    runs-on: ubuntu-latest
+    
+    # Create dependency on test job to deploy
+    needs: test
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # TODO: Deploy app to Cloud provider
+      - name: Deploy to Cloud
+        run: |
+          echo Deploying to Cloud...,
