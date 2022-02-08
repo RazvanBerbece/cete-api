@@ -13,7 +13,9 @@ Also available in **Projects**
 
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
-NodeJS
+- NodeJS, TypeScript (writing the code)
+- ESLint (linting)
+- Mocha (testing)
 ## 3.2 Server Hosting
 tbc
 ## 3.3 Data Storage
@@ -21,4 +23,9 @@ tbc
 
 # 4 DevOps
 ## 4.1 CI
+Uses GitHub Actions to run the npm scripts which install the npm packages, compile the TS code to JS code and execute the test scripts.
+See the CI workflow in ''''.github/CI.yml'''.
+
 ## 4.2 CD
+Uses GitHub Actions to run the npm scripts which will containerise / deploy the app to the Cloud.
+See the CD workflow in ''''.github/CD.yml'''.
