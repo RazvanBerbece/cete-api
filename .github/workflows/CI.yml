@@ -23,7 +23,6 @@ jobs:
       - name: Install npm packages
         run: |
           npm install
-          npm install -g mocha
       
       - name: Compile Typescript to JavaScript
         run: |

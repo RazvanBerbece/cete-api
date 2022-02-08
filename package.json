@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "npx eslint . --ext .ts",
-    "test": "npx mocha dist/test/test_models/Cete",
+    "test": "npx mocha dist/test/test_models/**/*.js",
     "start": "node dist/index.js"
   },
   "repository": {
