@@ -6,6 +6,14 @@ Built in NodeJS.
 # 1 Progress
 Also available in **Projects**
 
+[ ] Logic Models (Cete, User, etc.)
+
+[ ] Express Server (Endpoints)
+
+[ ] CI/CD (testing, deployment)
+
+[ ] Audio Data Processing (storage, retrieval from storage unit)
+
 # 2 Endpoints
 - GET xyz
 - POST abc
@@ -24,8 +32,8 @@ tbc
 # 4 DevOps
 ## 4.1 CI
 Uses GitHub Actions to run the npm scripts which install the npm packages, compile the TS code to JS code and execute the test scripts.
-See the CI workflow in ''''.github/CI.yml'''.
+See the CI workflow in ```.github/CI.yml```.
 
 ## 4.2 CD
 Uses GitHub Actions to run the npm scripts which will containerise / deploy the app to the Cloud.
-See the CD workflow in ''''.github/CD.yml'''.
+See the CD workflow in ```.github/CD.yml```.
