@@ -22,7 +22,7 @@ jobs:
       # Specifically install mocha due to a GitHub Actions bug not installing it
       - name: Install npm packages
         run: |
-          npm install,
+          npm install
           npm install -g mocha
       
       - name: Compile Typescript to JavaScript
