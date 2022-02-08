@@ -1,5 +1,6 @@
 // IMPORTS
 // ==========================================================================================
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import Response from './models/Response/Response';

@@ -8,7 +8,7 @@
     "build": "tsc",
     "lint": "npx eslint . --ext .ts",
     "test": "npx mocha dist/test/test_models/**/*.js",
-    "start": "node dist/index.js"
+    "start": "node --experimental-specifier-resolution=node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "body-parser": "^1.19.1",
+    "dotenv": "^16.0.0",
     "express": "^4.17.2"
   }
 }

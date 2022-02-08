@@ -6,16 +6,16 @@ Built in NodeJS.
 # 1 Progress
 Also available in **Projects**
 
-[~] Logic Models (Cete, User, etc.)
+[~] Logic Models (Cete, User, Response, etc.)
 
-[ ] Express Server (Endpoints)
+[~] Express Server (Endpoints)
 
 [~] CI/CD (testing, deployment)
 
 [ ] Audio Data Processing (storage, retrieval from storage unit)
 
 # 2 Endpoints
-- GET xyz
+- GET ```api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
 - POST abc
 - etc.
 
