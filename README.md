@@ -6,11 +6,11 @@ Built in NodeJS.
 # 1 Progress
 Also available in **Projects**
 
-[ ] Logic Models (Cete, User, etc.)
+[~] Logic Models (Cete, User, etc.)
 
 [ ] Express Server (Endpoints)
 
-[ ] CI/CD (testing, deployment)
+[~] CI/CD (testing, deployment)
 
 [ ] Audio Data Processing (storage, retrieval from storage unit)
 

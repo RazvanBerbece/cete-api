@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "npx eslint . --ext .ts",
-    "test": "echo Running test harnesses...",
+    "test": "mocha dist/test/test_models/Cete",
     "start": "node dist/index.js"
   },
   "repository": {
