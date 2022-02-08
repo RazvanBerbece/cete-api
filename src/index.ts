@@ -1,5 +1,6 @@
 // IMPORTS
 // ==========================================================================================
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import Response from './models/Response/Response';
@@ -19,7 +20,12 @@ const PORT = process.env.PORT || 5050;
 const router = express.Router();
 router.get('/', (req, res) => {
     res.json(
-        new Response(200, new Date().toLocaleString(), '/api/v1/', { message: `Server listening on port ${PORT}` })
+        new Response(
+            200, 
+            new Date().toLocaleString(), 
+            '/api/v1/', 
+            { message: `Server listening on port ${PORT}` }
+        )
     );
 })
 
