@@ -22,7 +22,15 @@ jobs:
       # Install npm packages from the package JSON file
       - name: Install npm packages
         run: |
-          echo Installing packages...,
+          npm install
+      
+      - name: Compile Typescript to JavaScript
+        run: |
+          npm run build
+      
+      - name: Lint TypeScript
+        run: |
+          npm run lint
 
   test:
 
@@ -35,7 +43,7 @@ jobs:
         # Run the test files for the API
         - name: Run test harness
           run: |
-            echo Running harness...,
+            npm test
 
   deploy:
 
