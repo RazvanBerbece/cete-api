@@ -9,6 +9,13 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  DB_HOST: ${{ secrets.AZURE_SQL_SERVER }}
+  DB_PORT: ${{ secrets.AZURE_SQL_PORT }}
+  DB_USER: ${{ secrets.AZURE_SQL_USER }}
+  DB_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+  DB_NAME: ${{ secrets.AZURE_SQL_DB }}     
+
 jobs:
   build:
 

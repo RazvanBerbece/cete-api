@@ -16,7 +16,7 @@ Also available in **Projects**
 
 # 2 Endpoints
 - GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
-- POST ```https://cete-api.azurewebsites.net/api/v1/upload/audio``` -> Post an audio file to the endpoint to store it in the Azure storage (TODO)
+- POST ```https://cete-api.azurewebsites.net/api/v1/upload/audio``` -> Post an audio file to the endpoint to store it in the Azure storage
 - etc.
 
 ## 2.1 Endpoints Request Templates

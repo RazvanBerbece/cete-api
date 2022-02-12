@@ -1,1 +1,1 @@
-{"version":3,"file":"statuses.js","sourceRoot":"","sources":["../../../models/StatusCode/statuses.ts"],"names":[],"mappings":";AAAA;;;GAGG;;AAEH,MAAM,YAAY,GAAG;IACjB,OAAO,EAAE,GAAG;IACZ,8BAA8B,EAAE,GAAG;IACnC,8BAA8B,EAAE,GAAG;CACtC,CAAA;AAED,kBAAe,YAAY,CAAC"}
+{"version":3,"file":"statuses.js","sourceRoot":"","sources":["../../../models/StatusCode/statuses.ts"],"names":[],"mappings":";AAAA;;;GAGG;;AAEH,MAAM,YAAY,GAAG;IACjB,OAAO,EAAE,GAAG;IACZ,8BAA8B,EAAE,GAAG;IACnC,8BAA8B,EAAE,GAAG;IACnC,eAAe,EAAE,GAAG;CACvB,CAAA;AAED,kBAAe,YAAY,CAAC"}
