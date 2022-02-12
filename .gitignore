@@ -132,3 +132,4 @@ out
 .DS_Store
 .vscode/
 local.settings.json
+cete-api.publishsettings
