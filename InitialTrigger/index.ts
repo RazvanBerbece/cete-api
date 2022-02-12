@@ -9,7 +9,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             200, 
             new Date().toLocaleString(), 
             '/api/v1/', 
-            { message: `cete-api routes up and running.` }
+            { message: `cete-api routes up and running!` }
         )
     };
 };
