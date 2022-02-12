@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Response_js_1 = __importDefault(require("../models/Response/Response.js"));
 const httpTrigger = function (context, req) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log('HTTP trigger function (v1/) is processing a GET request.');
+        context.log('HTTP trigger function (v1/upload/audio) is processing a POST request.');
         context.res = {
             // status: 200, /* Defaults to 200 */
-            body: new Response_js_1.default(200, new Date().toLocaleString(), '/api/v1/', { message: `cete-api routes up and running!` })
+            body: new Response_js_1.default(203, new Date().toLocaleString(), '/api/v1/upload/audio', { message: `Uploading Audio endpoint in progress.` })
         };
     });
 };
