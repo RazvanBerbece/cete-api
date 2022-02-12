@@ -30,17 +30,19 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     new Date().toLocaleString(), 
                     '/api/v1/upload/audio', 
                     { 
-                        error: `InvalidRequest : POST Request has no body.` 
+                        error: `InvalidRequestNoData : POST Request body has no data.` 
                     }
                 )
             };
         }
 
-        // Request has visible data
+        // Request has visible data, so set object fields using the public access methods
         ceteObj.setUserId(resultData.userId)
         ceteObj.setIsArchived(resultData.data.isArchived);
         ceteObj.setTimestamp(resultData.timestamp);
         ceteObj.setData(resultData.data.audioData);
+
+        // Generate ID and filepath for Cete
     
         context.res = {
             status: 200,
@@ -59,7 +61,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 new Date().toLocaleString(), 
                 '/api/v1/upload/audio', 
                 { 
-                    error: `InvalidRequest : POST Request has no body.` 
+                    error: `InvalidRequestNoBody : POST Request has no body.` 
                 }
             )
         };

@@ -8,16 +8,29 @@ Also available in **Projects**
 
 [~] Logic Models (Cete, User, Response, etc.)
 
-[~] Azure functions (~~v1/~~, v1/upload/audio)
+[~] Azure functions (~~v1/~~, v1/upload/audio, v1/get/audio)
 
 [~] CI/CD (testing, ~deployment~)
 
-[ ] Audio Data Processing (storage, retrieval from storage unit)
+[~] Audio Data Processing (storage, retrieval from storage unit)
 
 # 2 Endpoints
 - GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
 - POST ```https://cete-api.azurewebsites.net/api/v1/upload/audio``` -> Post an audio file to the endpoint to store it in the Azure storage (TODO)
 - etc.
+
+## 2.1 Endpoints Request Templates
+1. ```api/v1/upload/audio```
+POST
+    JSON
+        {
+            "userId": <string>,
+            "timestamp": <int_UNIX_TIME>, 
+            "data": {
+                "audioData": <string_base64>,
+                "isArchived": <boolean>
+            }
+        }
 
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
@@ -28,7 +41,7 @@ Also available in **Projects**
 - GitHub Actions (CI/CD)
 ## 3.2 Server Hosting
 The Endpoints are hosted and executed as Azure functions. Azure provides reliable, scalable, serverless features for NodeJS projects. 
-Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs.
+Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'
 ## 3.3 Data Storage
 tbc
 
