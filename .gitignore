@@ -133,3 +133,5 @@ out
 .vscode/
 local.settings.json
 cete-api.publishsettings
+models/AzureDBClient/config.ts
+*.pem
