@@ -1,3 +1,4 @@
+"use strict";
 /**
  * CLASS Cete
  * Logical model for a "Cete", an audio file which gets uploaded / shared / archived / liked
@@ -7,6 +8,7 @@
  * It also contains a filepath field, which is initialised with 'NaN'
  * and can be updated with the actual filepath where the audio file will be stored on the storage blob
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 class Cete {
     constructor() {
         this.filepath = 'NaN';
@@ -51,5 +53,5 @@ class Cete {
         return;
     }
 }
-export default Cete;
+exports.default = Cete;
 //# sourceMappingURL=Cete.js.map

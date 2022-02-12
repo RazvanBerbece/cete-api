@@ -1,8 +1,10 @@
+"use strict";
 /**
  * CLASS Response
  *
  * Models a response that clients will get from the cete-api
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 class Response {
     constructor(statusCode, timestamp, route, data) {
         this.statusCode = statusCode;
@@ -31,5 +33,5 @@ class Response {
         this.data = newData;
     }
 }
-export default Response;
+exports.default = Response;
 //# sourceMappingURL=Response.js.map

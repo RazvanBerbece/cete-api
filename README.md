@@ -8,7 +8,7 @@ Also available in **Projects**
 
 [~] Logic Models (Cete, User, Response, etc.)
 
-[~] Express Server (Endpoints)
+[~] Azure functions (v1/...)
 
 [~] CI/CD (testing, deployment)
 
@@ -22,10 +22,11 @@ Also available in **Projects**
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
 - NodeJS, TypeScript (writing the code)
+- Azure functions (serverless)
 - ESLint (linting)
 - Mocha (testing)
 ## 3.2 Server Hosting
-tbc
+The Endpoints are hosted and executed as Azure functions. Azure provides reliable, scalable, serverless features for NodeJS projects. 
 ## 3.3 Data Storage
 tbc
 

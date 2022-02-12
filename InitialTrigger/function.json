@@ -1,0 +1,20 @@
+{
+  "bindings": [
+    {
+      "route": "v1/",
+      "authLevel": "Anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    }
+  ],
+  "scriptFile": "../dist/InitialTrigger/index.js"
+}
