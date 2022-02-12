@@ -130,3 +130,5 @@ out
 
 # Other
 .DS_Store
+.vscode/
+local.settings.json
