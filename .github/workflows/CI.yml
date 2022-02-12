@@ -18,6 +18,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Setup Node 14.x Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
       # Install npm packages from the package JSON file
       # Specifically install mocha due to a GitHub Actions bug not installing it
       - name: Install npm packages
