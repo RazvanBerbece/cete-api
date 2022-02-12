@@ -42,7 +42,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         ceteObj.setTimestamp(resultData.timestamp);
         ceteObj.setData(resultData.data.audioData);
 
-        // Generate ID and filepath for Cete
+        // Generate ID and process filepath for Cete
     
         context.res = {
             status: 200,

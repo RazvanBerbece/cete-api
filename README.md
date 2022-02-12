@@ -21,8 +21,11 @@ Also available in **Projects**
 
 ## 2.1 Endpoints Request Templates
 1. ```api/v1/upload/audio```
+
 POST
+
     JSON
+    
         {
             "userId": <string>,
             "timestamp": <int_UNIX_TIME>, 
