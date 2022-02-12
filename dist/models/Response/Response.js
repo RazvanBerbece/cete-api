@@ -6,8 +6,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 class Response {
-    constructor(statusCode, timestamp, route, data) {
-        this.statusCode = statusCode;
+    constructor(timestamp, route, data) {
         this.timestamp = timestamp;
         this.route = route;
         this.data = data;
@@ -20,7 +19,6 @@ class Response {
     }
     getDictionary() {
         return {
-            statusCode: this.statusCode,
             timestamp: this.timestamp,
             route: this.route,
             data: this.getData()

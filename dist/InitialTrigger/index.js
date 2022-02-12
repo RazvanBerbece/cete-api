@@ -13,12 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Response_js_1 = __importDefault(require("../models/Response/Response.js"));
-const httpTrigger = function (context, req) {
+const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
+const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/) is processing a GET request.');
         context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: new Response_js_1.default(200, new Date().toLocaleString(), '/api/v1/', { message: `cete-api routes up and running!` })
+            status: statuses_js_1.default.SUCCESS,
+            body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/', { message: `cete-api routes up and running!` })
         };
     });
 };

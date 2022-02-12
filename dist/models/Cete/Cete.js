@@ -11,6 +11,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Cete {
     constructor() {
+        this.isArchived = false;
         this.filepath = 'NaN';
     }
     /**
@@ -39,6 +40,9 @@ class Cete {
      */
     setCeteId(newCeteId) {
         this.ceteId = newCeteId;
+    }
+    setUserId(newUserId) {
+        this.userId = newUserId;
     }
     setTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;

@@ -10,14 +10,18 @@
 
 class Cete {
 
+    // Processed by server
     private ceteId: string;
-    private userId: string;
-    private timestamp: Date;
-    private data: string;
-    private isArchived: boolean;
     private filepath: string;
 
+    // Obtained from Client
+    private userId: string;
+    private timestamp: Date; 
+    private data: string;
+    private isArchived: boolean;
+
     constructor() {
+        this.isArchived = false;
         this.filepath = 'NaN';
     }
 
@@ -48,6 +52,9 @@ class Cete {
      */
     public setCeteId(newCeteId: string) {
         this.ceteId = newCeteId;
+    }
+    public setUserId(newUserId: string) {
+        this.userId = newUserId;
     }
     public setTimestamp(newTimestamp: Date) {
         this.timestamp = newTimestamp;
