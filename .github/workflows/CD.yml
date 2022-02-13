@@ -86,7 +86,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
