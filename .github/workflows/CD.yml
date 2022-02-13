@@ -79,12 +79,12 @@ jobs:
     # Create dependency on test job to deploy
     needs: test
 
+    environment:
+      name: 'production'
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      environment:
-        name: 'production'
 
       steps:
       - name: Download artifact from build job
