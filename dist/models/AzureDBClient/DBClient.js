@@ -9,7 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *
  * Handles getting credentials, connection, running queries and returning useful outputs
  */
-const tedious_1 = require("tedious");
+const tedious_1 = __importDefault(require("tedious"));
+const tedious_2 = __importDefault(require("tedious"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const crypto_1 = __importDefault(require("crypto"));
 dotenv_1.default.config();
@@ -41,7 +42,7 @@ class DBClient {
      * Establish a connection to the Azure SQL DB using the mysql package
      */
     establishConnection() {
-        this.connection = new tedious_1.Connection(this.config);
+        this.connection = new tedious_2.default.Connection(this.config);
         this.connection.connect();
     }
     /**
@@ -73,7 +74,7 @@ class DBClient {
                 return ["", err.message];
             }
             else {
-                const request = new tedious_1.Request(query, (err, rowCount) => {
+                const request = new tedious_1.default.Request(query, (err, rowCount) => {
                     if (err) {
                         console.log(err.message);
                         return ["", err.message];
@@ -103,7 +104,7 @@ class DBClient {
                 throw err.message;
             }
             else {
-                const request = new tedious_1.Request(query, (err, rowCount) => {
+                const request = new tedious_1.default.Request(query, (err, rowCount) => {
                     if (err) {
                         console.log(err.message);
                         throw err.message;

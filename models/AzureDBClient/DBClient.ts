@@ -4,7 +4,8 @@
  * 
  * Handles getting credentials, connection, running queries and returning useful outputs
  */
- import { Request, Connection } from "tedious";
+import RequestModule from "tedious";
+import ConnectionModule from "tedious";
 import dotenv from "dotenv";
 import crypto from "crypto";
 
@@ -13,7 +14,7 @@ dotenv.config();
 class DBClient {
 
     private config: Record < string, unknown > ;
-    private connection: Connection;
+    private connection: ConnectionModule.Connection;
 
     constructor() {
         this.config = {
@@ -43,7 +44,7 @@ class DBClient {
      * Establish a connection to the Azure SQL DB using the mysql package
      */
     private establishConnection() {
-        this.connection = new Connection(this.config);
+        this.connection = new ConnectionModule.Connection(this.config);
         this.connection.connect();
     }
 
@@ -79,7 +80,7 @@ class DBClient {
                 console.log(err.message);
                 return ["", err.message];
             } else {
-                const request = new Request(
+                const request = new RequestModule.Request(
                     query,
                     (err, rowCount) => {
                         if (err) {
@@ -118,7 +119,7 @@ class DBClient {
                 console.log(err.message);
                 throw err.message;
             } else {
-                const request = new Request(
+                const request = new RequestModule.Request(
                     query,
                     (err, rowCount) => {
                         if (err) {
