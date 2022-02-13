@@ -63,7 +63,7 @@ jobs:
           npm uninstall eslint-visitor-keys
           npm uninstall mocha
 
-      - name: Tar files (fix permissions)
+      - name: Compress Build Files & Fix Permissions
         run: tar -cvf build_files.tar *
 
       - name: Upload Artifact for Deployment Job
@@ -89,7 +89,7 @@ jobs:
           name: cete-api-app
 
       - name: Decompress Artifact
-        run: tar -xvzf build_files.tar
+        run: tar -xvf build_files.tar
 
       # Deploy app to Azure Functions App
       - name: Deploy to Cloud
