@@ -53,7 +53,7 @@ jobs:
           npm run lint --if-present
       
       # Remove unused packages from current build package, to reduce deployment time (artifact upload)
-      - name: Remove unused packages
+      - name: Remove Unused Packages
         run: |
           npm uninstall @types/mocha
           npm uninstall @typescript-eslint
@@ -63,11 +63,14 @@ jobs:
           npm uninstall eslint-visitor-keys
           npm uninstall mocha
 
+      - name: Tar files (fix permissions)
+        run: tar -cvf build_files.tar *
+
       - name: Upload Artifact for Deployment Job
         uses: actions/upload-artifact@v2
         with:
           name: cete-api-app
-          path: .
+          path: build_files.tar  
 
   deploy:
 
