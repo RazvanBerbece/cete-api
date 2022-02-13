@@ -89,7 +89,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: node-app
+          name: cete-api-app
 
       # Deploy app to Azure Functions App
       - name: Deploy to Cloud
