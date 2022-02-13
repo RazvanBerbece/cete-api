@@ -85,6 +85,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
+    environment: production
     
     # Create dependency on test job to deploy
     needs: build

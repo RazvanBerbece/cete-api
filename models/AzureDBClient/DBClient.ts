@@ -65,6 +65,8 @@ class DBClient {
             while(this.existsInCeteIndexing(idToInsert)) {
                 idToInsert = crypto.randomBytes(20).toString('hex');
             }
+            this.connection.close();
+            this.connection = null;
         } catch (err) {
             return ["", err];
         }
@@ -134,6 +136,10 @@ class DBClient {
                         }
                     }
                 );
+
+                request.on('requestCompleted', () => {
+                    // Next SQL statement.
+                });
 
                 this.connection.execSql(request);
 
