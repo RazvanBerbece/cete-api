@@ -4,10 +4,7 @@
  * 
  * Handles getting credentials, connection, running queries and returning useful outputs
  */
- import {
-    Request,
-    Connection
-} from "tedious"
+ import { Request, Connection } from "tedious";
 import dotenv from "dotenv";
 import crypto from "crypto";
 
