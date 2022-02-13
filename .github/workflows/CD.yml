@@ -74,7 +74,7 @@ jobs:
           npm uninstall mocha
 
       - name: Compress Build Files & Fix Permissions
-        run: tar -cvf build_files.tar *
+        run: tar -cvf build_files.tar * .env
 
       - name: Upload Artifact for Deployment Job
         uses: actions/upload-artifact@v2
@@ -108,4 +108,4 @@ jobs:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-          # respect-funcignore: true
+          respect-funcignore: true
