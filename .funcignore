@@ -1,6 +1,7 @@
 *.js.map
 *.ts
-.git*
+.github
+.gitignore
 .vscode
 local.settings.json
 test/
