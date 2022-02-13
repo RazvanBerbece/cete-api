@@ -60,7 +60,7 @@ jobs:
           echo DB_USER=${{ env.DB_USER }} >> .env
           echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
           echo DB_NAME=${{ env.DB_NAME }} >> .env     
-          ls -a  
+          cat .env
       
       # Remove unused packages from current build package, to reduce deployment time (artifact upload)
       - name: Remove Unused Packages
