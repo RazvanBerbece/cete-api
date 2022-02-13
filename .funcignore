@@ -3,6 +3,7 @@
 .github
 .gitignore
 .vscode
+.git
 local.settings.json
 test/
 *.md

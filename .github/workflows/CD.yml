@@ -34,6 +34,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Create .env File
+        run: |
+          touch .env
+          echo DB_HOST=${{ env.DB_HOST }} >> .env
+          echo DB_PORT=${{ env.DB_PORT }} >> .env
+          echo DB_USER=${{ env.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
+          echo DB_NAME=${{ env.DB_NAME }} >> .env     
+          cat .env
+
       # Install npm packages from the package JSON file
       # Specifically install tedious to fix Azure 'cannot find module tedious' error
       - name: Install npm packages
@@ -51,16 +61,6 @@ jobs:
       - name: Lint TypeScript
         run: |
           npm run lint --if-present
-
-      - name: Create .env File
-        run: |
-          touch .env
-          echo DB_HOST=${{ env.DB_HOST }} >> .env
-          echo DB_PORT=${{ env.DB_PORT }} >> .env
-          echo DB_USER=${{ env.DB_USER }} >> .env
-          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
-          echo DB_NAME=${{ env.DB_NAME }} >> .env     
-          cat .env
       
       # Remove unused packages from current build package, to reduce deployment time (artifact upload)
       - name: Remove Unused Packages
