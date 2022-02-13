@@ -9,7 +9,12 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: cete-api
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'      # defaults to the repository root
-  NODE_VERSION: '14.x'                 
+  NODE_VERSION: '14.x'               
+  DB_HOST: ${{ secrets.AZURE_SQL_SERVER }}
+  DB_PORT: ${{ secrets.AZURE_SQL_PORT }}
+  DB_USER: ${{ secrets.AZURE_SQL_USER }}
+  DB_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+  DB_NAME: ${{ secrets.AZURE_SQL_DB }}       
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -30,9 +35,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       # Install npm packages from the package JSON file
+      # Specifically install tedious to fix Azure 'cannot find module tedious' error
       - name: Install npm packages
         run: |
           npm install
+          npm install tedious --save-dev
       
       - name: Compile Typescript to JavaScript
         run: |
@@ -71,7 +78,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # TODO: Deploy app to Cloud provider
+      # Deploy app to Azure Functions App
       - name: Deploy to Cloud
         uses: Azure/functions-action@v1
         with:
