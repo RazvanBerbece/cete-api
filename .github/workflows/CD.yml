@@ -42,7 +42,7 @@ jobs:
       
       - name: Compile Typescript to JavaScript
         run: |
-          npm run build
+          npm run build --if-present
 
       - name: Install TypeScript eslint
         run: |
@@ -50,7 +50,13 @@ jobs:
       
       - name: Lint TypeScript
         run: |
-          npm run lint
+          npm run lint --if-present
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: cete-api-app
+          path: .
 
   test:
 
@@ -64,7 +70,7 @@ jobs:
         # Run the test files for the API
         - name: Run test harness
           run: |
-            npm test
+            npm test --if-present
 
   deploy:
 
@@ -77,6 +83,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      environment:
+        name: 'production'
+
+      steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: node-app
+
       # Deploy app to Azure Functions App
       - name: Deploy to Cloud
         uses: Azure/functions-action@v1
@@ -85,4 +100,3 @@ jobs:
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           respect-funcignore: true
-          scm-do-build-during-deployment: true
