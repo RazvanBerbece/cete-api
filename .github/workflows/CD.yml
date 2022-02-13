@@ -88,6 +88,9 @@ jobs:
         with:
           name: cete-api-app
 
+      - name: Decompress Artifact
+        run: tar -xvzf build_files.tar
+
       # Deploy app to Azure Functions App
       - name: Deploy to Cloud
         uses: Azure/functions-action@v1
