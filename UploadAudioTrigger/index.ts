@@ -70,10 +70,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         default:
             // Got & stored ID successfully
             ceteObj.setCeteId(indexingOutput[0]);
-            // filepath is of form:
-            //      1. Cetes/userId/visible/ceteId.mp3,     when isArchived = false
-            //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
-            
+            // Use the stored ID and Cete data to process filepath
+            ceteObj.setFilePath();
 
             context.res = {
                 status: 200,
