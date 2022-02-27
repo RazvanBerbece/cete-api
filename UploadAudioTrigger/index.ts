@@ -64,7 +64,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     { 
                         error: `ServerDBError: Server could not connect to the database. ${indexingOutput[1]}.`,
                     }
-                )
+                ),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }; 
             break;
         default:
@@ -82,7 +85,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                         message: `Uploading Audio endpoint in progress.`,
                         ceteId: ceteObj.getCeteId() 
                     }
-                )
+                ),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }; 
     }
 
