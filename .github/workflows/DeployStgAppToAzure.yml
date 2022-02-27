@@ -80,7 +80,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     
     # Create dependency on test job to deploy
     needs: build
