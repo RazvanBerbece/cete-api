@@ -68,6 +68,9 @@ class Cete {
         this.isArchived = newIsArchived;
     }
     public setFilePath() {
+        // filepath is of form:
+        //      1. Cetes/userId/visible/ceteId.mp3,     when isArchived = false
+        //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
         return;
     }
 
@@ -85,7 +88,7 @@ class Cete {
      */
     public static generateAndStoreCeteId(): string[] {
 
-        // Connect to Azure DB
+        // Connect to Azure DB using the DBClient internal API
         const database_client = new DBClient();
 
         // Store

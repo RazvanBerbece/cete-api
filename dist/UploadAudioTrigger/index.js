@@ -65,9 +65,8 @@ const httpTrigger = function (context, req) {
             default:
                 // Got & stored ID successfully
                 ceteObj.setCeteId(indexingOutput[0]);
-                // filepath is of form:
-                //      1. Cetes/userId/visible/ceteId.mp3,     when isArchived = false
-                //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
+                // Use the stored ID and Cete data to process filepath
+                ceteObj.setFilePath();
                 context.res = {
                     status: 200,
                     body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/upload/audio', {
