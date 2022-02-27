@@ -10,7 +10,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             new Date().toLocaleString(), 
             '/api/v1/', 
             { message: `cete-api routes up and running!` }
-        )
+        ),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     };
 };
 
