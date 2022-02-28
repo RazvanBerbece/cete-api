@@ -1,13 +1,13 @@
 # Workflow that runs on PRs and automates the integration & testing process
-name: CD
+name: deploy-stg-app-to-azure
 
 on:
   # Triggers the workflow on push events to main
   push:
-    branches: [ main ]
+    branches: [ staging ]
 
 env:
-  AZURE_FUNCTIONAPP_NAME: cete-api
+  AZURE_FUNCTIONAPP_NAME: cete-stg-api
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'     
   NODE_VERSION: '14.x'               
  
@@ -80,7 +80,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     
     # Create dependency on test job to deploy
     needs: build
@@ -103,5 +103,5 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZURE_STG_FUNCTIONAPP_PUBLISH_PROFILE }} # currently, only publish to the staging env
+          publish-profile: ${{ secrets.AZURE_STG_FUNCTIONAPP_PUBLISH_PROFILE }}
           respect-funcignore: true

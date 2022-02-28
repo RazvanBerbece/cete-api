@@ -1,0 +1,107 @@
+# Workflow that runs on PRs and automates the integration & testing process
+name: deploy-prd-app-to-azure
+
+on:
+  # Triggers the workflow on push events to main
+  push:
+    branches: [ main ]
+
+env:
+  AZURE_FUNCTIONAPP_NAME: cete-prd-api
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'     
+  NODE_VERSION: '14.x'               
+ 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Test integration first before deploying
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Create .env File
+        run: |
+          touch .env
+          echo DB_HOST=${{ env.DB_HOST }} >> .env
+          echo DB_PORT=${{ env.DB_PORT }} >> .env
+          echo DB_USER=${{ env.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
+          echo DB_NAME=${{ env.DB_NAME }} >> .env   
+          cat .env
+
+      # Install npm packages from the package JSON file
+      # Specifically install tedious to fix Azure 'cannot find module tedious' error
+      - name: Install npm packages
+        run: |
+          npm install
+      
+      - name: Compile Typescript to JavaScript
+        run: |
+          npm run build --if-present
+
+      - name: Install TypeScript eslint
+        run: |
+          npm install @typescript-eslint/eslint-plugin@latest --save-dev
+      
+      - name: Lint TypeScript
+        run: |
+          npm run lint --if-present
+      
+      # Remove unused packages from current build package, to reduce deployment time (artifact upload)
+      - name: Remove Unused Packages
+        run: |
+          npm uninstall @types/mocha
+          npm uninstall @typescript-eslint
+          npm uninstall eslint
+          npm uninstall eslint-scope
+          npm uninstall eslint-utils
+          npm uninstall eslint-visitor-keys
+          npm uninstall mocha
+
+      - name: Compress Build Files & Fix Permissions
+        run: tar -cvf build_files.tar * .env
+
+      - name: Upload Artifact for Deployment Job
+        uses: actions/upload-artifact@v2
+        with:
+          name: cete-api-app
+          path: build_files.tar  
+
+  deploy:
+
+    runs-on: ubuntu-latest
+    environment: production
+    
+    # Create dependency on test job to deploy
+    needs: build
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Download Artifact from Build Job
+        uses: actions/download-artifact@v2
+        with:
+          name: cete-api-app
+
+      - name: Decompress Artifact
+        run: tar -xvf build_files.tar
+
+      # Deploy app to Azure Functions App
+      - name: Deploy to Cloud
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZURE_PRD_FUNCTIONAPP_PUBLISH_PROFILE }}
+          respect-funcignore: true
