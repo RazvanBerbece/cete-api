@@ -1,4 +1,8 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * CLASS Cete
  * Logical model for a "Cete", an audio file which gets uploaded / shared / archived / liked
@@ -8,10 +12,6 @@
  * It also contains a filepath field, which is initialised with 'NaN'
  * and can be updated with the actual filepath where the audio file will be stored on the storage blob
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 const DBClient_1 = __importDefault(require("../AzureDBClient/DBClient"));
 class Cete {
     constructor() {
@@ -76,19 +76,25 @@ class Cete {
      *                             second index is the error message, if the op failed
      */
     static generateAndStoreCeteId() {
-        // Connect to Azure DB using the DBClient internal API
-        const database_client = new DBClient_1.default();
-        // Store
-        const output = database_client.insertNewCeteIDInCeteIndexing();
-        // Return output based on the result of the DB operation
-        switch (output[1]) {
-            case "":
-                // successful, return id
-                return [output[0], ""];
-            default:
-                // failed, return err message
-                return ["NaN", output[1]];
-        }
+        return new Promise((resolve, reject) => {
+            // Connect to Azure DB using the DBClient internal API
+            const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Indexes");
+            // Store a new ID for a Cete
+            database_client.insertNewCeteIDInCeteIndexing()
+                .then((response) => {
+                // Return output based on the result of the DB operation
+                switch (response[1]) {
+                    case "":
+                        // successful, return Cete id
+                        resolve([response[0], ""]);
+                        break;
+                    default:
+                        // failed, return err message
+                        reject(["NaN", response[1]]);
+                        break;
+                }
+            });
+        });
     }
 }
 exports.default = Cete;

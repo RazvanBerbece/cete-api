@@ -32,15 +32,11 @@ jobs:
       - name: Create .env File
         run: |
           touch .env
-          echo DB_HOST=${{ env.DB_HOST }} >> .env
-          echo DB_PORT=${{ env.DB_PORT }} >> .env
-          echo DB_USER=${{ env.DB_USER }} >> .env
-          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
-          echo DB_NAME=${{ env.DB_NAME }} >> .env   
+          echo COSMOS_PRD_DB_CONN_STRING=${{ secrets.COSMOS_PRD_DB_CONN_STRING }} >> .env
+          echo ENVIRONMENT=prd >> .env 
           cat .env
 
       # Install npm packages from the package JSON file
-      # Specifically install tedious to fix Azure 'cannot find module tedious' error
       - name: Install npm packages
         run: |
           npm install

@@ -7,7 +7,6 @@
  * It also contains a filepath field, which is initialised with 'NaN' 
  * and can be updated with the actual filepath where the audio file will be stored on the storage blob
  */
-
 import DBClient from "../AzureDBClient/DBClient";
 
 class Cete {
@@ -86,23 +85,28 @@ class Cete {
      * @returns output: string[] - first index is the id, if the op was successful, 
      *                             second index is the error message, if the op failed
      */
-    public static generateAndStoreCeteId(): string[] {
+    public static generateAndStoreCeteId(): Promise<string[]> {
 
-        // Connect to Azure DB using the DBClient internal API
-        const database_client = new DBClient();
+        return new Promise((resolve, reject) => {
+            // Connect to Azure DB using the DBClient internal API
+            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Indexes");
 
-        // Store
-        const output = database_client.insertNewCeteIDInCeteIndexing();
-
-        // Return output based on the result of the DB operation
-        switch (output[1]) {
-            case "":
-                // successful, return id
-                return [output[0], ""];
-            default:
-                // failed, return err message
-                return ["NaN", output[1]];
-        }
+            // Store a new ID for a Cete
+            database_client.insertNewCeteIDInCeteIndexing()
+            .then((response: string[]) => {
+                // Return output based on the result of the DB operation
+                switch (response[1]) {
+                    case "":
+                        // successful, return Cete id
+                        resolve([response[0], ""]);
+                        break;
+                    default:
+                        // failed, return err message
+                        reject(["NaN", response[1]]);
+                        break;
+                }
+            });
+        });
     }
 
 }
