@@ -19,7 +19,10 @@ const httpTrigger = function (context) {
         context.log('HTTP trigger function (v1/) is processing a GET request.');
         context.res = {
             status: statuses_js_1.default.SUCCESS,
-            body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/', { message: `cete-api routes up and running!` })
+            body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/', { message: `cete-api routes up and running!` }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         };
     });
 };

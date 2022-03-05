@@ -136,3 +136,5 @@ cete-api.publishsettings
 models/AzureDBClient/config.ts
 *.pem
 *.publishsettings
+dbconfig.js
+stg-db-config.js

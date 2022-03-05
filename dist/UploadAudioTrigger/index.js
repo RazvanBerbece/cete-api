@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Cete_js_1 = __importDefault(require("../models/Cete/Cete.js"));
 const Response_js_1 = __importDefault(require("../models/Response/Response.js"));
 const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 /**
  * POST ROUTE
  * Uploads audio data to a specific user's entry in Azure Storage
@@ -51,7 +54,7 @@ const httpTrigger = function (context, req) {
         ceteObj.setTimestamp(resultData.timestamp);
         ceteObj.setData(resultData.data.audioData);
         // Generate ID and process filepath for Cete
-        const indexingOutput = Cete_js_1.default.generateAndStoreCeteId();
+        const indexingOutput = yield Cete_js_1.default.generateAndStoreCeteId();
         switch (indexingOutput[0]) {
             case "NaN":
                 // error occured, id is NaN
@@ -59,7 +62,10 @@ const httpTrigger = function (context, req) {
                     status: statuses_js_1.default.SERVER_DB_ERROR,
                     body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/upload/audio', {
                         error: `ServerDBError: Server could not connect to the database. ${indexingOutput[1]}.`,
-                    })
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 };
                 break;
             default:
@@ -72,7 +78,10 @@ const httpTrigger = function (context, req) {
                     body: new Response_js_1.default(new Date().toLocaleString(), '/api/v1/upload/audio', {
                         message: `Uploading Audio endpoint in progress.`,
                         ceteId: ceteObj.getCeteId()
-                    })
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 };
         }
     });
