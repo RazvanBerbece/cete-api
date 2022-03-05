@@ -3,6 +3,10 @@ import Cete from "../models/Cete/Cete.js";
 import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses.js";
 
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
+
 /**
  * POST ROUTE
  * Uploads audio data to a specific user's entry in Azure Storage
@@ -52,7 +56,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     ceteObj.setData(resultData.data.audioData);
 
     // Generate ID and process filepath for Cete
-    const indexingOutput = Cete.generateAndStoreCeteId();
+    const indexingOutput = await Cete.generateAndStoreCeteId();
     switch (indexingOutput[0]) {
         case "NaN":
             // error occured, id is NaN
