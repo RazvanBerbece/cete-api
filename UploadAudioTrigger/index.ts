@@ -51,12 +51,13 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     // Use values from the POST key:value pairs
     const ceteObj = new Cete();
     ceteObj.setUserId(resultData.userId)
-    ceteObj.setIsArchived(resultData.data.isArchived);
+    ceteObj.setIsArchived(resultData.isArchived);
     ceteObj.setTimestamp(resultData.timestamp);
     ceteObj.setData(resultData.data.audioData);
 
     // Generate ID and process filepath for Cete
-    const indexingOutput = await Cete.generateAndStoreCeteId();
+    // and store in SQL Collection
+    const indexingOutput = await Cete.processAndStoreCete(ceteObj);
     switch (indexingOutput[0]) {
         case "NaN":
             // error occured, id is NaN
@@ -66,7 +67,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     new Date().toLocaleString(), 
                     '/api/v1/upload/audio', 
                     { 
-                        error: `ServerDBError: Server could not connect to the database. ${indexingOutput[1]}.`,
+                        error: `ServerDBError: Server could not upload Cete metadata to database. ${indexingOutput[1]}.`,
                     }
                 ),
                 headers: {
@@ -75,18 +76,13 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             }; 
             break;
         default:
-            // Got & stored ID successfully
-            ceteObj.setCeteId(indexingOutput[0]);
-            // Use the stored ID and Cete data to process filepath
-            ceteObj.setFilePath();
-
             context.res = {
                 status: 200,
                 body: new Response(
                     new Date().toLocaleString(), 
                     '/api/v1/upload/audio', 
                     { 
-                        message: `Uploading Audio endpoint in progress.`,
+                        message: `Uploaded Cete metadata to database successfully.`,
                         ceteId: ceteObj.getCeteId() 
                     }
                 ),
