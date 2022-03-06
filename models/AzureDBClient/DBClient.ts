@@ -5,8 +5,9 @@
  * Handles getting credentials, connection, running queries and returning useful outputs
  * 
  */
+// import crypto from "crypto";
 import { Container, CosmosClient, Database, SqlQuerySpec } from "@azure/cosmos";
-import crypto from "crypto";
+import Cete from "../Cete/Cete";
 
 class DBClient {
 
@@ -26,6 +27,17 @@ class DBClient {
         this.container = this.database.container(containerId);
     }
 
+    public async updateCeteInCeteIndexing(updatedCete: Cete) {
+        try {
+            const { resource: updatedItemFromUpstream } = await this.container.item(updatedCete.getCeteId()).replace(updatedCete.getDict())
+            console.log(updatedItemFromUpstream);
+            return;
+        }
+        catch (err) {
+            return err;
+        }
+    }
+
     /**
      * 
      * These are accessed by other processes directly, and manage running queries on the DB
@@ -34,7 +46,7 @@ class DBClient {
      * 
      * @return: {id, err}: string[] - stored id of Cete if successful, error message if failed
      */
-    public async insertNewCeteIDInCeteIndexing() {
+    public async insertNewCeteInCeteIndexing(cete: Cete) {
 
         // INDEX CETE 
         // 1. Generate random id and insert
@@ -54,9 +66,13 @@ class DBClient {
         // }
         // 2. Use in-built CosmosDB indexing feature
         try {
-            const { resource: createdItem } = await this.container.items.create({flag: true});
-            console.log(createdItem);
-            return [createdItem.id, ""];
+            const { resource: createdItem } = await this.container.items.create(cete.getDict());
+
+            cete.setCeteId(createdItem.id);
+            cete.setFilePath();
+
+            this.updateCeteInCeteIndexing(cete)
+            return [cete.getCeteId(), ""];
         }
         catch (err) {
             return ["NaN", err];

@@ -16,6 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Handles getting credentials, connection, running queries and returning useful outputs
  *
  */
+// import crypto from "crypto";
 const cosmos_1 = require("@azure/cosmos");
 class DBClient {
     /**
@@ -29,6 +30,18 @@ class DBClient {
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
     }
+    updateCeteInCeteIndexing(updatedCete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { resource: updatedItemFromUpstream } = yield this.container.item(updatedCete.getCeteId()).replace(updatedCete.getDict());
+                console.log(updatedItemFromUpstream);
+                return;
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
     /**
      *
      * These are accessed by other processes directly, and manage running queries on the DB
@@ -37,7 +50,7 @@ class DBClient {
      *
      * @return: {id, err}: string[] - stored id of Cete if successful, error message if failed
      */
-    insertNewCeteIDInCeteIndexing() {
+    insertNewCeteInCeteIndexing(cete) {
         return __awaiter(this, void 0, void 0, function* () {
             // INDEX CETE 
             // 1. Generate random id and insert
@@ -57,9 +70,11 @@ class DBClient {
             // }
             // 2. Use in-built CosmosDB indexing feature
             try {
-                const { resource: createdItem } = yield this.container.items.create({ flag: true });
-                console.log(createdItem);
-                return [createdItem.id, ""];
+                const { resource: createdItem } = yield this.container.items.create(cete.getDict());
+                cete.setCeteId(createdItem.id);
+                cete.setFilePath();
+                this.updateCeteInCeteIndexing(cete);
+                return [cete.getCeteId(), ""];
             }
             catch (err) {
                 return ["NaN", err];
