@@ -36,6 +36,7 @@ All REST requests carry a payload of type application/json.
 
 ## 2.2 Endpoints Request Templates (Responses)
 1. POST ```api/v1/upload/audio``` (RESPONSE)
+
         {
             "timestamp": <int_UNIX_TIME>, 
             "route": <string>,
