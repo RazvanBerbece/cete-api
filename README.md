@@ -24,7 +24,7 @@ Also available in **Projects**
 ## 2.1 Endpoints Request Templates
 1. POST ```api/v1/upload/audio```
 
-    REQ {
+        {
             "userId": <string>,
             "timestamp": <int_UNIX_TIME>, 
             "data": {
@@ -33,7 +33,7 @@ Also available in **Projects**
             }
         }
 
-    RES {
+        {
             "timestamp": <int_UNIX_TIME>, 
             "route": <string>,
             "data": {
