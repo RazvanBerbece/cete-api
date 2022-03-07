@@ -17,6 +17,7 @@ Also available in **Projects**
 [~] Audio Data Processing (~~metadata storage~~, audio data storage, retrieval from storage unit/s)
 
 # 2 Endpoints
+All REST requests carry a payload of type application/json.
 - GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
 - POST ```https://cete-api.azurewebsites.net/api/v1/upload/audio``` -> Post an audio file to the endpoint to store it in the Azure storage
 - etc.
@@ -24,7 +25,6 @@ Also available in **Projects**
 ## 2.1 Endpoints Request Templates
 1. POST ```api/v1/upload/audio```
 
-    REQUEST
         {
             "userId": <string>,
             "timestamp": <int_UNIX_TIME>, 
@@ -33,16 +33,17 @@ Also available in **Projects**
                 "isArchived": <boolean>
             }
         }
-    RESULT
+
+## 2.2 Endpoints Request Templates (Responses)
+1. POST ```api/v1/upload/audio``` (RESPONSE)
+
         {
             "timestamp": <int_UNIX_TIME>, 
             "route": <string>,
             "data": {
                 "message": <string>,
                 "ceteId": <string>
-            }
-}
-    
+        }
 
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
