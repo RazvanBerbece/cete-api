@@ -9,10 +9,21 @@
  */
 import DBClient from "../AzureDBClient/DBClient";
 
+type CeteDict = {
+    id: string,
+    userId: string,
+    timestamp: Date,
+    data: {
+        audioData: string,
+        filepath: string
+    },
+    isArchived: boolean
+};
+
 class Cete {
 
     // Processed by server
-    private ceteId: string;
+    private id: string;
     private filepath: string;
 
     // Obtained from Client
@@ -30,7 +41,7 @@ class Cete {
      * Public access methods for Cete fields
      */
     public getCeteId(): string {
-        return this.ceteId;
+        return this.id;
     }
     public getUserId(): string {
         return this.userId;
@@ -52,7 +63,7 @@ class Cete {
      * Public setter methods for Cete fields
      */
     public setCeteId(newCeteId: string) {
-        this.ceteId = newCeteId;
+        this.id = newCeteId;
     }
     public setUserId(newUserId: string) {
         this.userId = newUserId;
@@ -68,36 +79,46 @@ class Cete {
     }
     public setFilePath() {
         // filepath is of form:
-        //      1. Cetes/userId/visible/ceteId.mp3,     when isArchived = false
+        //      1. Cetes/userId/public/ceteId.mp3,      when isArchived = false
         //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
-        return;
+        this.filepath = this.getisArchived() ? `Cetes/${this.getUserId()}/archived/${this.getCeteId()}.mp3` : `Cetes/${this.getUserId()}/public/${this.getCeteId()}.mp3`
+    }
+
+    public getDict(): CeteDict {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            data: {
+                audioData: this.getData(),
+                filepath: this.getFilePath()
+            },
+            isArchived: this.getisArchived()
+        }
     }
 
     /**
      * Cete statics
      */
     /**
-     * Generates a random ID using the crypto package for newly uploaded Cetes
-     * Then queries the CeteIndexing SQL database > CeteIDs table to see if the ID exists
-     *  1. If it does, generate a new ID and retry
-     *  2. If it doesn't exist, INSERT it
+     * Saves a Cete metadata to the SQL Collection.
+     * It uses the default CosmosDB itemID for indexing and the Cete object to be stored
      * 
-     * @returns output: string[] - first index is the id, if the op was successful, 
+     * @returns output: string[] - first index is the Cete id, if the op was successful, 
      *                             second index is the error message, if the op failed
      */
-    public static generateAndStoreCeteId(): Promise<string[]> {
+    public static processAndStoreCete(cete: Cete): Promise<string[]> {
 
         return new Promise((resolve, reject) => {
             // Connect to Azure DB using the DBClient internal API
-            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Indexes");
+            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
             // Store a new ID for a Cete
-            database_client.insertNewCeteIDInCeteIndexing()
-            .then((response: string[]) => {
+            database_client.insertNewCeteInCeteIndexing(cete)
+            .then((response) => {
                 // Return output based on the result of the DB operation
                 switch (response[1]) {
                     case "":
-                        // successful, return Cete id
                         resolve([response[0], ""]);
                         break;
                     default:

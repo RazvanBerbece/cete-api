@@ -3,16 +3,18 @@
 
 Built in TypeScript & NodeJS. Published on the Cloud through the Azure Function App.
 
+It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-infrastructure) for resources (app func, storage, etc.)
+
 # 1 Progress
 Also available in **Projects**
 
-[~] Logic Models (Cete, User, Response, etc.)
+[~] Logic Models (~~Cete~~, User, Response, etc.)
 
 [~] Azure functions (~~v1/~~, v1/upload/audio, v1/get/audio)
 
 [~] CI/CD (testing, ~deployment~)
 
-[~] Audio Data Processing (storage, retrieval from storage unit)
+[~] Audio Data Processing (~~metadata storage~~, audio data storage, retrieval from storage unit/s)
 
 # 2 Endpoints
 - GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
@@ -22,6 +24,7 @@ Also available in **Projects**
 ## 2.1 Endpoints Request Templates
 1. POST ```api/v1/upload/audio```
 
+    REQUEST
         {
             "userId": <string>,
             "timestamp": <int_UNIX_TIME>, 
@@ -30,6 +33,16 @@ Also available in **Projects**
                 "isArchived": <boolean>
             }
         }
+    RESULT
+        {
+            "timestamp": <int_UNIX_TIME>, 
+            "route": <string>,
+            "data": {
+                "message": <string>,
+                "ceteId": <string>
+            }
+}
+    
 
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
