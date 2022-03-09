@@ -29,9 +29,9 @@ All REST requests carry a payload of type application/json.
             "userId": <string>,
             "timestamp": <int_UNIX_TIME>, 
             "data": {
-                "audioData": <string_base64>,
-                "isArchived": <boolean>
-            }
+                "audioData": <string_base64>
+            },
+            "isArchived": <boolean>
         }
 
 ## 2.2 Endpoints Request Templates (Responses)
