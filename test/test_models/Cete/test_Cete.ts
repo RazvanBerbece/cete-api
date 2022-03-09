@@ -7,6 +7,10 @@
 import assert from 'assert';
 import Cete from '../../../models/Cete/Cete';
 
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
+
 describe('CLASS Cete', function() {
     describe('#processAndStoreCete()', function() {
       it('should return "NaN" when the id cannot be calculated', function() {

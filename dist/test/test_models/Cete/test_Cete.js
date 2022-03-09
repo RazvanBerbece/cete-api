@@ -10,6 +10,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // import Cete from "../../../models/Cete/Cete"
 const assert_1 = __importDefault(require("assert"));
 const Cete_1 = __importDefault(require("../../../models/Cete/Cete"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 describe('CLASS Cete', function () {
     describe('#processAndStoreCete()', function () {
         it('should return "NaN" when the id cannot be calculated', function () {

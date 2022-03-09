@@ -93,7 +93,7 @@ class Cete {
     static processAndStoreCete(cete) {
         return new Promise((resolve, reject) => {
             // Connect to Azure DB using the DBClient internal API
-            const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+            const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes", "cetes");
             // Store a new ID for a Cete
             database_client.insertNewCeteInCeteIndexing(cete)
                 .then((response) => {
