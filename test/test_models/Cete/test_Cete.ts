@@ -35,7 +35,7 @@ describe('CLASS Cete', function() {
         ceteObj_public.setFilePath();
         assert.strictEqual(
           ceteObj_public.getFilePath(), 
-          "Cetes/testUsedId123/public/123456789abcdef.mp3", 
+          "testUsedId123/public/123456789abcdef.wav", 
           "setFilePath() for public Cete failed to create the correct path"
         );
 
@@ -47,7 +47,7 @@ describe('CLASS Cete', function() {
         ceteObj_archived.setFilePath();
         assert.strictEqual(
           ceteObj_archived.getFilePath(), 
-          "Cetes/testUsedId123/archived/123456789abcdef.mp3", 
+          "testUsedId123/archived/123456789abcdef.wav", 
           "setFilePath() for archived Cete failed to create the correct path"
         );
 
@@ -60,7 +60,6 @@ describe('CLASS Cete', function() {
           1,
           "setFilePath() for Cete with missing details (userId) failed to return Error"
         );
-
 
         // Cete with missing details (ceteId)
         const ceteObj_missing_ceteId = new Cete()

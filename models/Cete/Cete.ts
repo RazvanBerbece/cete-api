@@ -7,7 +7,7 @@
  * It also contains a filepath field, which is initialised with 'NaN' 
  * and can be updated with the actual filepath where the audio file will be stored on the storage blob
  */
-import DBClient from "../AzureDBClient/DBClient";
+import DBClient from "../AzureCosmosDBClient/DBClient";
 
 type CeteDict = {
     id: string,
@@ -85,7 +85,7 @@ class Cete {
         if (!this.getCeteId() || !this.getUserId()) {
             return Error("Cannot process path for a Cete without a userId and a ceteId");
         }
-        this.filepath = this.getisArchived() ? `Cetes/${this.getUserId()}/archived/${this.getCeteId()}.mp3` : `Cetes/${this.getUserId()}/public/${this.getCeteId()}.mp3`
+        this.filepath = this.getisArchived() ? `${this.getUserId()}/archived/${this.getCeteId()}.wav` : `${this.getUserId()}/public/${this.getCeteId()}.wav`
         return 1;
     }
 
@@ -116,7 +116,7 @@ class Cete {
 
         return new Promise((resolve, reject) => {
             // Connect to Azure DB using the DBClient internal API
-            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes", "cetes");
+            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
             // Store a new ID for a Cete
             database_client.insertNewCeteInCeteIndexing(cete)
