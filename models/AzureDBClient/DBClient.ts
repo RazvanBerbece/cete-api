@@ -153,7 +153,7 @@ class DBClient {
         const data = cete.getData();
         const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
         console.log(
-            "Blob was uploaded successfully. requestId: ",
+            "Blob was uploaded successfully. requestId:",
             uploadBlobResponse.requestId
         );
 
