@@ -1,13 +1,12 @@
 /**
  * CLASS DBClient
- * API for the Azure SQL tool suite (SQL Server, SQL Database)
+ * API for the Azure CosmosDB tool suite
  * 
  * Handles getting credentials, connection, running queries and returning useful outputs
  * 
  */
-// import crypto from "crypto";
 import { Container, CosmosClient, Database, SqlQuerySpec } from "@azure/cosmos";
-import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import StorageBlobClient from "../AzureBlobStorageClient/BlobClient";
 import Cete from "../Cete/Cete";
 
 class DBClient {
@@ -17,18 +16,13 @@ class DBClient {
     private database: Database;
     private container: Container;
 
-    // Azure Storage Container fields (Blob Storage)
-    private blobServiceClient: BlobServiceClient;
-    private blobContainerClient: ContainerClient;
-
     /**
-     * Creates a CosmosDB Client and Blob Storage Client using environment variables for the connection strings
+     * Creates a CosmosDB Client using the environment variable for the connection string
      *     - connects to the CosmosDB database with databaseId and gets the container with containerId within that database
-     *     - connects to the blobContainerName Blob Container
      * @param databaseId - id for database to connect client to
      * @param containerId - id for container within the database object returned from the databaseId
      */
-    constructor(databaseId: string, containerId: string, blobContainerName: string) {
+    constructor(databaseId: string, containerId: string) {
 
         // Constant used to dynamically refer to either the staging or production environment on Azure, 
         // based on the ENVIRONMENT env variable
@@ -39,10 +33,6 @@ class DBClient {
         this.client = new CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
-
-        // initialise BlobServiceClient
-        this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
-        this.blobContainerClient = this.blobServiceClient.getContainerClient(blobContainerName);
     }
 
     /**
@@ -98,7 +88,8 @@ class DBClient {
             this.updateCeteInCeteIndexing(cete)
 
             // Upload Cete data to MP3 Blob
-            const uploadOpStatus = await this.uploadCeteToMP3Blob(cete);
+            const blobClient = new StorageBlobClient("cetes");
+            const uploadOpStatus = await blobClient.uploadCeteToWAVBlob(cete);
             if (uploadOpStatus != 1) {
                 return ["NaN", uploadOpStatus.message];
             }
@@ -132,33 +123,6 @@ class DBClient {
         .catch((err) => {
             throw err;
         });
-
-    }
-
-    /**
-     * Azure Storage & Blob Management Functions
-     */ 
-    public async uploadCeteToMP3Blob(cete: Cete): Promise<1 | Error> {
-
-        // Create blob name
-        const blobName = cete.getFilePath();
-        if (blobName == "NaN") {
-            return Error("Cete does not have a filepath.");
-        }
-
-        // Get a block blob client
-        const blockBlobClient = this.blobContainerClient.getBlockBlobClient(blobName);
-
-        // Upload data to the blob
-        const data = cete.getData();
-        const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
-        console.log(
-            "Blob was uploaded successfully. requestId:",
-            uploadBlobResponse.requestId
-        );
-
-        // TODO: Maybe return processed thumbnail ? (if done on server-side)
-        return 1;
 
     }
 

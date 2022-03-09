@@ -32,14 +32,14 @@ describe('CLASS Cete', function () {
             ceteObj_public.setCeteId(example_ceteId);
             ceteObj_public.setUserId(example_userId);
             ceteObj_public.setFilePath();
-            assert_1.default.strictEqual(ceteObj_public.getFilePath(), "Cetes/testUsedId123/public/123456789abcdef.mp3", "setFilePath() for public Cete failed to create the correct path");
+            assert_1.default.strictEqual(ceteObj_public.getFilePath(), "testUsedId123/public/123456789abcdef.wav", "setFilePath() for public Cete failed to create the correct path");
             // Cete with 'archived' status
             const ceteObj_archived = new Cete_1.default();
             ceteObj_archived.setCeteId(example_ceteId);
             ceteObj_archived.setUserId(example_userId);
             ceteObj_archived.setIsArchived(true);
             ceteObj_archived.setFilePath();
-            assert_1.default.strictEqual(ceteObj_archived.getFilePath(), "Cetes/testUsedId123/archived/123456789abcdef.mp3", "setFilePath() for archived Cete failed to create the correct path");
+            assert_1.default.strictEqual(ceteObj_archived.getFilePath(), "testUsedId123/archived/123456789abcdef.wav", "setFilePath() for archived Cete failed to create the correct path");
             // Cete with missing details (userId)
             const ceteObj_missing_userId = new Cete_1.default();
             ceteObj_missing_userId.setCeteId(example_ceteId);
