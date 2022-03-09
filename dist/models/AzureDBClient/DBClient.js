@@ -18,18 +18,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 // import crypto from "crypto";
 const cosmos_1 = require("@azure/cosmos");
+const storage_blob_1 = require("@azure/storage-blob");
 class DBClient {
     /**
-     * Creates a CosmosDB Client using the connection string
-     * Also connects to the database with databaseId and gets the container with contairId within that database
+     * Creates a CosmosDB Client and Blob Storage Client using environment variables for the connection strings
+     *     - connects to the CosmosDB database with databaseId and gets the container with containerId within that database
+     *     - connects to the blobContainerName Blob Container
      * @param databaseId - id for database to connect client to
      * @param containerId - id for container within the database object returned from the databaseId
      */
-    constructor(databaseId, containerId) {
-        this.client = new cosmos_1.CosmosClient(process.env[`COSMOS_${process.env['ENVIRONMENT'].toUpperCase()}_DB_CONN_STRING`]);
+    constructor(databaseId, containerId, blobContainerName) {
+        // Constant used to dynamically refer to either the staging or production environment on Azure, 
+        // based on the ENVIRONMENT env variable
+        const ENV = process.env['ENVIRONMENT'].toUpperCase();
+        // initialise CosmosClient
+        this.client = new cosmos_1.CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
+        // initialise BlobServiceClient
+        this.blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
+        this.blobContainerClient = this.blobServiceClient.getContainerClient(blobContainerName);
     }
+    /**
+     * CosmosDB Management Functions
+     */
     /**
      * Updates an existing ceteObj in the indexing table
      * @param updatedCete - Cete with existing ceteId to be updated. Uses the rest of the object fields to update
@@ -43,13 +55,13 @@ class DBClient {
                 return;
             }
             catch (err) {
-                return err;
+                return Error(`${err}`);
             }
         });
     }
     /**
      * Deletes an existing ceteObj from the indexing table
-     * @param updatedCete - Cete with existing ceteId to be deleted
+     * @param ceteToDelete - Cete with existing ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
     deleteCeteFromCeteIndexing(ceteToDelete) {
@@ -60,14 +72,10 @@ class DBClient {
                 return;
             }
             catch (err) {
-                return err;
+                return Error(`${err}`);
             }
         });
     }
-    /**
-     *
-     * These are accessed by other processes directly, and manage running queries on the DB
-     */
     /**
      * Inserts a new ceteObj in the CosmosDB indexing table
      * @return: {id, err}: string[] - stored id of Cete if successful, error message if failed
@@ -81,7 +89,13 @@ class DBClient {
                 if (setFilePathStatus != 1) { // setFilePath() failed, return Error message
                     return ["NaN", setFilePathStatus.message];
                 }
+                // Update Cete in CosmosDB table with the generated filepath
                 this.updateCeteInCeteIndexing(cete);
+                // Upload Cete data to MP3 Blob
+                const uploadOpStatus = yield this.uploadCeteToMP3Blob(cete);
+                if (uploadOpStatus != 1) {
+                    return ["NaN", uploadOpStatus.message];
+                }
                 return [cete.getCeteId(), ""];
             }
             catch (err) {
@@ -111,6 +125,29 @@ class DBClient {
             throw err;
         });
     }
+    /**
+     * Azure Storage & Blob Management Functions
+     */
+    uploadCeteToMP3Blob(cete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Create blob name
+            const blobName = cete.getFilePath();
+            if (blobName == "NaN") {
+                return Error("Cete does not have a filepath.");
+            }
+            // Get a block blob client
+            const blockBlobClient = this.blobContainerClient.getBlockBlobClient(blobName);
+            // Upload data to the blob
+            const data = cete.getData();
+            const uploadBlobResponse = yield blockBlobClient.upload(data, data.length);
+            console.log("Blob was uploaded successfully. requestId: ", uploadBlobResponse.requestId);
+            // TODO: Maybe return processed thumbnail ? (if done on server-side)
+            return 1;
+        });
+    }
+    /**
+     * STATIC UTILS
+     */
     /**
      * Returns a dictionary which can be used as a query configuration with the @azure/cosmos
      * @param sqlCmd - SQL Command to containerise
