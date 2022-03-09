@@ -26,15 +26,37 @@ class DBClient {
      * @param containerId - id for container within the database object returned from the databaseId
      */
     constructor(databaseId, containerId) {
-        this.client = new cosmos_1.CosmosClient(process.env["COSMOS_STG_DB_CONN_STRING"]);
+        this.client = new cosmos_1.CosmosClient(process.env[`COSMOS_${process.env['ENVIRONMENT'].toUpperCase()}_DB_CONN_STRING`]);
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
     }
+    /**
+     * Updates an existing ceteObj in the indexing table
+     * @param updatedCete - Cete with existing ceteId to be updated. Uses the rest of the object fields to update
+     * @returns void, err if error occurs while updating the Cete
+     */
     updateCeteInCeteIndexing(updatedCete) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { resource: updatedItemFromUpstream } = yield this.container.item(updatedCete.getCeteId()).replace(updatedCete.getDict());
-                console.log(updatedItemFromUpstream);
+                // console.log(updatedItemFromUpstream);
+                return;
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    /**
+     * Deletes an existing ceteObj from the indexing table
+     * @param updatedCete - Cete with existing ceteId to be deleted
+     * @returns void, err if error occurs while deleting the Cete
+     */
+    deleteCeteFromCeteIndexing(ceteToDelete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { resource: deleteOpResult } = yield this.container.item(ceteToDelete.getCeteId()).delete();
+                // console.log(deleteOpResult);
                 return;
             }
             catch (err) {
@@ -47,32 +69,18 @@ class DBClient {
      * These are accessed by other processes directly, and manage running queries on the DB
      */
     /**
-     *
+     * Inserts a new ceteObj in the CosmosDB indexing table
      * @return: {id, err}: string[] - stored id of Cete if successful, error message if failed
      */
     insertNewCeteInCeteIndexing(cete) {
         return __awaiter(this, void 0, void 0, function* () {
-            // INDEX CETE 
-            // 1. Generate random id and insert
-            // let idToInsert = crypto.randomBytes(20).toString('hex');
-            // try {
-            //     // @ts-ignore: Value will be the right type at run-time
-            //     while(this.existsInCeteIndexing(idToInsert) == 1) {
-            //         idToInsert = crypto.randomBytes(20).toString('hex');;
-            //     }
-            //     // Configure query & execute it after establishing the connection
-            //     const query = `INSERT INTO c (flag) VALUES (${idToInsert}, 1)`;
-            //     // etc.
-            // }
-            // catch (err) {
-            //     // console.log(err);
-            //     return ["NaN", err];
-            // }
-            // 2. Use in-built CosmosDB indexing feature
             try {
                 const { resource: createdItem } = yield this.container.items.create(cete.getDict());
                 cete.setCeteId(createdItem.id);
-                cete.setFilePath();
+                const setFilePathStatus = cete.setFilePath();
+                if (setFilePathStatus != 1) { // setFilePath() failed, return Error message
+                    return ["NaN", setFilePathStatus.message];
+                }
                 this.updateCeteInCeteIndexing(cete);
                 return [cete.getCeteId(), ""];
             }
@@ -84,8 +92,7 @@ class DBClient {
     /**
      * Queries the -ExistingCeteIDs DB to find the 'id' argument.
      * Returns 0 is not in DB, 1 if in DB, or throws errors
-     *
-     * @param {string} id - ID of a Cete against which the -ExistingCeteIDs DB is queried
+     * @param {string} id - ID of a Cete (ceteId) against which the -ExistingCeteIDs DB is queried
      * @returns {boolean} status - 1 (in DB), 0 (not in DB), throw err
      */
     existsInCeteIndexing(id) {
