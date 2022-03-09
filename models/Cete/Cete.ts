@@ -81,7 +81,12 @@ class Cete {
         // filepath is of form:
         //      1. Cetes/userId/public/ceteId.mp3,      when isArchived = false
         //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
+        // Only set filepath if userId and ceteId are set
+        if (!this.getCeteId() || !this.getUserId()) {
+            return Error("Cannot process path for a Cete without a userId and a ceteId");
+        }
         this.filepath = this.getisArchived() ? `Cetes/${this.getUserId()}/archived/${this.getCeteId()}.mp3` : `Cetes/${this.getUserId()}/public/${this.getCeteId()}.mp3`
+        return 1;
     }
 
     public getDict(): CeteDict {
