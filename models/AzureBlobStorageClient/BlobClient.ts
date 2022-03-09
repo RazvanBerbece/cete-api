@@ -5,7 +5,7 @@
  * Handles connection, uploading & downloading data and returning useful outputs
  * 
  */
-import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import { BlobClient, BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import Cete from "../Cete/Cete";
 
 class StorageBlobClient {
@@ -57,30 +57,80 @@ class StorageBlobClient {
     }
 
     /**
-     * Gets a list of items from the Azure blobs under userId
+     * Gets a list of metadata items from the Azure blobs under userId
      * @param userId - the downloaded cetes will haven been posted by the user with userId
      * @param archived - whether to get publicly visible cetes or archived ones
      * @param countLimit - how many cetes to load from userId/s blob
      * @returns number of cetes downloaded, Error if failed
      */
-    public async getCetesForUserIdFromWAVBlob(userId: string, archived: boolean, countLimit: number): Promise<any[] | Error> {
+    public async getCetesMetadataForUserIdFromWAVBlob(userId: string, archived: boolean, countLimit: number): Promise<BlobItem[] | Error> {
+
         const cetes = [];
         const visibilityPath = archived == true ? 'archived' : 'public';
+
         try {
             for await (const blob of this.blobContainerClient.listBlobsFlat({ prefix: `${userId}/${visibilityPath}` })) {
                 if (cetes.length >= countLimit) { 
                     break; 
                 }
-                console.log("\t", blob.name);
                 cetes.push(blob)
             }
-            console.log(cetes);
             return cetes;
         }
         catch (err) {
             return Error(`${err}`);
         }
     }
+
+    /**
+     * Downloads a list of items from the Azure blobs under userId
+     * @param userId - the downloaded cetes will haven been posted by the user with userId
+     * @param archived - whether to get publicly visible cetes or archived ones
+     * @returns number of cetes downloaded, Error if failed
+     */
+    public async downloadCetesDataForUserIdFromWAVBlob(userId: string, archived: boolean, limit: number): Promise<BlobItem[] | Error> {
+
+        const cetes = [];
+
+        try {
+
+            const getMetadataResult = await this.getCetesMetadataForUserIdFromWAVBlob(userId, archived, limit);
+            if (getMetadataResult instanceof Error) {
+                return Error(getMetadataResult.message);
+            }
+            else {
+                for (let i = 0; i < getMetadataResult.length; ++i) {
+                    // Get a block blob client for current blob in iteration
+                    const blockBlobClient = this.blobContainerClient.getBlockBlobClient(getMetadataResult[i].name);
+                    const downloadBlockBlobResponse = await blockBlobClient.download(0);
+                    cetes.push(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody))
+                }
+
+                console.log(cetes);
+                return cetes;
+            }
+        }
+        catch (err) {
+            return Error(`${err}`);
+        }
+
+    }
+
+    /**
+     * UTILS
+     */
+     public static async streamToString(readableStream) {
+        return new Promise((resolve, reject) => {
+            const chunks = [];
+            readableStream.on("data", (data) => {
+                chunks.push(data.toString());
+            });
+        readableStream.on("end", () => {
+            resolve(chunks.join(""));
+        });
+        readableStream.on("error", reject);
+        });
+   }
 
 }
 
