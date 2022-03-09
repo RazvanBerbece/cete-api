@@ -59,6 +59,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install Test-Specific Packages
+        run: |
+          npm install @azure/cosmos@latest --save-dev
+
       # Run the test files for the API
       - name: Run test harness
         run: |
