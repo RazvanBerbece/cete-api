@@ -126,6 +126,11 @@ class DBClient {
 
     }
 
+    /**
+     * Gets a cete object with ceteId from the CosmosDB Indexing DB 
+     * @param ceteId - id of cete to be downloaded
+     * @returns cete object as in CosmosDB
+     */
     public getCetefromCeteIndexing(ceteId: string) {
         return new Promise((resolve, reject) => {
             const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE c.id='${ceteId}'`);

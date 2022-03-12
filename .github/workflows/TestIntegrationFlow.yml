@@ -1,5 +1,5 @@
 # Workflow that runs on PRs and automates the integration & testing process
-name: Test-Integration
+name: test-integration-workflow
 
 on:
   # Triggers the workflow on pull request events to main

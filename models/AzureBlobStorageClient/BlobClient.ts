@@ -9,7 +9,7 @@ import { FeedResponse } from "@azure/cosmos";
 import { BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import DBClient from "../AzureCosmosDBClient/DBClient";
 import Cete from "../Cete/Cete";
-import { CeteDictWithData } from "../Cete/Cete";
+import { CeteDictWithData } from "../Cete/CeteTypes";
 
 class StorageBlobClient {
 
@@ -146,6 +146,13 @@ class StorageBlobClient {
 
     }
 
+    /**
+     * Downloads cete audioData from the WAV Blob using the filepath stored in the CosmosDB Indexing
+     * @param userId - id of user downloading the cete data
+     * @param ceteId - id of cete data to be downloaded
+     * @param archived - visibility of cete
+     * @returns CeteDictWithData if successful, Error if failed
+     */
     public async downloadCeteFromWAVBlob(userId: string, ceteId: string, archived: boolean): Promise<CeteDictWithData | Error> {
         return new Promise((resolve, reject) => {
             try {
