@@ -59,8 +59,8 @@ class Cete {
     }
     setFilePath() {
         // filepath is of form:
-        //      1. Cetes/userId/public/ceteId.mp3,      when isArchived = false
-        //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
+        //      1. Cetes/userId/public/ceteId.wav,      when isArchived = false
+        //      2. Cetes/userId/archived/ceteId.wav,    when isArchived = true 
         // Only set filepath if userId and ceteId are set
         if (!this.getCeteId() || !this.getUserId()) {
             return Error("Cannot process path for a Cete without a userId and a ceteId");
@@ -75,6 +75,40 @@ class Cete {
             timestamp: this.getTimestamp(),
             data: {
                 audioData: this.getData(),
+                filepath: this.getFilePath()
+            },
+            isArchived: this.getisArchived()
+        };
+    }
+    getCeteDictWithData() {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            data: {
+                audioData: this.getData(),
+            },
+            isArchived: this.getisArchived()
+        };
+    }
+    getDictForProfile() {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            isArchived: this.getisArchived()
+        };
+    }
+    /**
+     * Get a dictionary representation of the Cete but without the audioData field
+     * @returns Indexing-friendly dict of a Cete (drops the audioData field)
+     */
+    getIndexingDict() {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            data: {
                 filepath: this.getFilePath()
             },
             isArchived: this.getisArchived()

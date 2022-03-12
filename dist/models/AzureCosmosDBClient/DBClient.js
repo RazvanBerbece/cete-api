@@ -49,7 +49,7 @@ class DBClient {
     updateCeteInCeteIndexing(updatedCete) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { resource: updatedItemFromUpstream } = yield this.container.item(updatedCete.getCeteId()).replace(updatedCete.getDict());
+                const { resource: updatedItemFromUpstream } = yield this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict());
                 // console.log(updatedItemFromUpstream);
                 return;
             }
@@ -82,7 +82,7 @@ class DBClient {
     insertNewCeteInCeteIndexing(cete) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { resource: createdItem } = yield this.container.items.create(cete.getDict());
+                const { resource: createdItem } = yield this.container.items.create(cete.getIndexingDict());
                 cete.setCeteId(createdItem.id);
                 const setFilePathStatus = cete.setFilePath();
                 if (setFilePathStatus != 1) { // setFilePath() failed, return Error message
@@ -90,7 +90,7 @@ class DBClient {
                 }
                 // Update Cete in CosmosDB table with the generated filepath
                 this.updateCeteInCeteIndexing(cete);
-                // Upload Cete data to MP3 Blob
+                // Upload Cete data to WAV Blob
                 const blobClient = new BlobClient_1.default("cetes");
                 const uploadOpStatus = yield blobClient.uploadCeteToWAVBlob(cete);
                 if (uploadOpStatus != 1) {
@@ -106,11 +106,11 @@ class DBClient {
     /**
      * Queries the -ExistingCeteIDs DB to find the 'id' argument.
      * Returns 0 is not in DB, 1 if in DB, or throws errors
-     * @param {string} id - ID of a Cete (ceteId) against which the -ExistingCeteIDs DB is queried
+     * @param {string} ceteId - ID of a Cete (ceteId) against which the -ExistingCeteIDs DB is queried
      * @returns {boolean} status - 1 (in DB), 0 (not in DB), throw err
      */
-    existsInCeteIndexing(id) {
-        const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE id='${id}'`);
+    existsInCeteIndexing(ceteId) {
+        const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE id='${ceteId}'`);
         this.container.items
             .query(querySelectSpec)
             .fetchAll()
@@ -123,6 +123,18 @@ class DBClient {
         })
             .catch((err) => {
             throw err;
+        });
+    }
+    getCetefromCeteIndexing(ceteId) {
+        return new Promise((resolve, reject) => {
+            const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE c.id='${ceteId}'`);
+            this.container.items.query(querySelectSpec).fetchAll()
+                .then((result) => {
+                resolve(result.resources[0]);
+            })
+                .catch((err) => {
+                reject(err);
+            });
         });
     }
     /**

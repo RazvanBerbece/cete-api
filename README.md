@@ -6,11 +6,9 @@ Built in TypeScript & NodeJS. Published on the Cloud through the Azure Function 
 It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-infrastructure) for resources (app func, storage, etc.)
 
 # 1 Progress
-Also available in **Projects**
-
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (~~v1/~~, v1/upload/audio, v1/get/audio)
+[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~, v1/get/feed)
 
 [~] CI/CD (testing, ~deployment~)
 
@@ -18,12 +16,15 @@ Also available in **Projects**
 
 # 2 Endpoints
 All REST requests carry a payload of type application/json.
-- GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on
-- POST ```https://cete-api.azurewebsites.net/api/v1/upload/audio``` -> Post an audio file to the endpoint to store it in the Azure storage
+- GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
+- POST ```https://cete-api.azurewebsites.net/api/v1/upload/profile/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
+- GET ```https://cete-api.azurewebsites.net/api/v1/get/profile/cetes``` -> Get a list of Cete objects under a userId with the given visibility. Limits the amount of objects retrieved through the 'limit' query parameter.
+- GET ```https://cete-api.azurewebsites.net/api/v1/get/cete/id``` -> Get a cete object with base64 audioData which can be translated on client-side to play audio.
+- GET ```https://cete-api.azurewebsites.net/api/v1/get/feed``` -> Get a list of Cetes to be displayed on a user feed.
 - etc.
 
 ## 2.1 Endpoints Request Templates
-1. POST ```api/v1/upload/audio```
+1. POST ```api/v1/upload/profile/cete```
 
         {
             "userId": <string>,
@@ -35,12 +36,12 @@ All REST requests carry a payload of type application/json.
         }
 
 ## 2.2 Endpoints Request Templates (Responses)
-1. POST ```api/v1/upload/audio``` (RESPONSE)
+1. POST ```api/v1/upload/profile/cete``` (RESPONSE)
 
         {
             "timestamp": <int_UNIX_TIME>, 
             "route": <string>,
-            "data": {
+            "resource": {
                 "message": <string>,
                 "ceteId": <string>
             }
@@ -50,6 +51,7 @@ All REST requests carry a payload of type application/json.
 ## 3.1 Languages & Frameworks
 - NodeJS, TypeScript, JavaScript (writing the code)
 - Azure Function App (serverless & publishing)
+- Azure Storage & CosmosDB (Data storage)
 - ESLint (linting)
 - Mocha (testing)
 - GitHub Actions (CI/CD)
@@ -61,7 +63,7 @@ Implemented as IaC (Infrastructure as Code) using Terraform, the code can be eas
 The Endpoints are hosted and executed as Azure functions. Azure provides reliable, scalable, serverless features for NodeJS projects. 
 Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'
 ## 4.2 Data Storage
-Uses CosmosDB for metadata indexing. Actual audio data is stored in Azure Storage Containers within Blobs.
+Uses CosmosDB for metadata indexing. Actual audio data is stored in Azure Storage Containers within WAV-type Blobs.
 
 # 5 DevOps
 ## 5.1 CI

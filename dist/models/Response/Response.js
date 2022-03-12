@@ -6,29 +6,29 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 class Response {
-    constructor(timestamp, route, data) {
+    constructor(timestamp, route, resource) {
         this.timestamp = timestamp;
         this.route = route;
-        this.data = data;
+        this.resource = resource;
     }
     /**
      * Public access methods
      */
-    getData() {
-        return this.data;
+    getResource() {
+        return this.resource;
     }
     getDictionary() {
         return {
             timestamp: this.timestamp,
             route: this.route,
-            data: this.getData()
+            resource: this.getResource()
         };
     }
     /**
      * Public setter methods
      */
-    setData(newData) {
-        this.data = newData;
+    setResource(newResource) {
+        this.resource = newResource;
     }
 }
 exports.default = Response;
