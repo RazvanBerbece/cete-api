@@ -8,7 +8,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 # 1 Progress
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~)
+[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~, v1/get/feed)
 
 [~] CI/CD (testing, ~deployment~)
 
@@ -20,6 +20,7 @@ All REST requests carry a payload of type application/json.
 - POST ```https://cete-api.azurewebsites.net/api/v1/upload/profile/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
 - GET ```https://cete-api.azurewebsites.net/api/v1/get/profile/cetes``` -> Get a list of Cete objects under a userId with the given visibility. Limits the amount of objects retrieved through the 'limit' query parameter.
 - GET ```https://cete-api.azurewebsites.net/api/v1/get/cete/id``` -> Get a cete object with base64 audioData which can be translated on client-side to play audio.
+- GET ```https://cete-api.azurewebsites.net/api/v1/get/feed``` -> Get a list of Cetes to be displayed on a user feed.
 - etc.
 
 ## 2.1 Endpoints Request Templates
