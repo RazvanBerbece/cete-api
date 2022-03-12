@@ -15,15 +15,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * CLASS StorageBlobClient
- * API for the Azure Storage Container (Blob Storage) tool suite
- *
- * Handles connection, uploading & downloading data and returning useful outputs
- *
- */
 const storage_blob_1 = require("@azure/storage-blob");
+const DBClient_1 = __importDefault(require("../AzureCosmosDBClient/DBClient"));
+const Cete_1 = __importDefault(require("../Cete/Cete"));
 class StorageBlobClient {
     constructor(blobContainerName) {
         // Constant used to dynamically refer to either the staging or production environment on Azure, 
@@ -34,9 +32,10 @@ class StorageBlobClient {
         this.blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
         this.blobContainerClient = this.blobServiceClient.getContainerClient(blobContainerName);
     }
-    /* Uploads audio data (base64 encoded) from the cete argument to a Blob on Azure with an audio/wav content-type.
+    /**
+     * Uploads audio data (base64 encoded) from the cete argument to a Blob on Azure with an audio/wav content-type.
      * @param cete - cete to be uplaoded to Blob
-     * @returns - 1 if successful, Error if failed
+     * @returns 1 if successful, Error if failed
      */
     uploadCeteToWAVBlob(cete) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -98,10 +97,9 @@ class StorageBlobClient {
      * @param archived - whether to get publicly visible cetes or archived ones
      * @returns number of cetes downloaded, Error if failed
      */
-    downloadCetesDataForUserIdFromWAVBlob(userId, archived, limit) {
+    downloadCetesDataForProfile(userId, archived, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const cetes = [];
-            const visibilityPath = archived == true ? 'archived' : 'public';
+            const cetes = []; // will be returned and will hold Cete objects under userId with the given visibility
             try {
                 const getMetadataResult = yield this.getCetesMetadataForUserIdFromWAVBlob(userId, archived, limit);
                 if (getMetadataResult instanceof Error) {
@@ -109,18 +107,79 @@ class StorageBlobClient {
                 }
                 else {
                     for (let i = 0; i < getMetadataResult.length; ++i) {
-                        // Get a block blob client for current blob in iteration
+                        // Populate a Cete object to be added to the list of objects
+                        const ceteObj = new Cete_1.default();
+                        // Get a block blob client for current blob in iteration & download
                         const blockBlobClient = this.blobContainerClient.getBlockBlobClient(getMetadataResult[i].name);
                         const downloadBlockBlobResponse = yield blockBlobClient.download(0);
-                        cetes.push(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+                        // Set data of the ceteObj with the string streamed from the .download() result
+                        ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+                        // Set ceteObj fields
+                        ceteObj.setIsArchived(archived);
+                        ceteObj.setUserId(userId);
+                        // Get CeteId from BlobItem name
+                        ceteObj.setCeteId(yield StorageBlobClient.getCeteIdFromBlobItem(getMetadataResult[i]));
+                        // Connect to Azure DB using the DBClient internal API
+                        const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+                        // Get Cete timestamp
+                        yield database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
+                            .then((response) => {
+                            ceteObj.setTimestamp(response["timestamp"]);
+                            cetes.push(ceteObj.getDictForProfile());
+                        })
+                            .catch(() => {
+                            return Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`);
+                        });
                     }
-                    console.log(cetes);
                     return cetes;
                 }
             }
             catch (err) {
                 return Error(`${err}`);
             }
+        });
+    }
+    downloadCeteFromWAVBlob(userId, ceteId, archived) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                try {
+                    let filepath;
+                    // Connect to Azure DB using the DBClient internal API
+                    const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+                    // Get Cete Filepath from indexing
+                    database_client.getCetefromCeteIndexing(ceteId)
+                        .then((response) => __awaiter(this, void 0, void 0, function* () {
+                        filepath = response["data"]["filepath"];
+                        // Populate a Cete object to be added to the list of objects
+                        const ceteObj = new Cete_1.default();
+                        // Get a block blob client for current blob in iteration & download
+                        const blockBlobClient = this.blobContainerClient.getBlockBlobClient(filepath);
+                        const downloadBlockBlobResponse = yield blockBlobClient.download(0);
+                        // Set data of the ceteObj with the string streamed from the .download() result
+                        ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+                        // Set ceteObj fields
+                        ceteObj.setIsArchived(archived);
+                        ceteObj.setUserId(userId);
+                        // Get CeteId from BlobItem name
+                        ceteObj.setCeteId(ceteId);
+                        // Get Cete timestamp
+                        yield database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
+                            .then((response) => {
+                            ceteObj.setTimestamp(response["timestamp"]);
+                            resolve(ceteObj.getCeteDictWithData());
+                        })
+                            .catch(() => {
+                            reject(Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`));
+                        });
+                    }))
+                        .catch(() => {
+                        reject(Error(`ServerErrorGetIdFromIndexing : Failed to get audio data for cete with id ${ceteId}`));
+                    });
+                }
+                catch (err) {
+                    reject(Error(`${err}`));
+                }
+            });
         });
     }
     /**
@@ -137,6 +196,33 @@ class StorageBlobClient {
                     resolve(chunks.join(""));
                 });
                 readableStream.on("error", reject);
+            });
+        });
+    }
+    /**
+     * Returns the ceteId of a BlobItem using the .name field
+     * @param blobItem - BlobItem object used to get ceteId from
+     * @returns ceteId
+     */
+    static getCeteIdFromBlobItem(blobItem) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                let ceteId;
+                const filepath = blobItem.name;
+                // Iterate backwards through string and create ceteId between '.wav' and the last '/' (/ceteId.wav)
+                // Skip the .wav right to left
+                let reversedCeteId = '';
+                for (let i = filepath.length - 5; i >= 0; i--) {
+                    if (filepath[i] != '/') {
+                        reversedCeteId += filepath[i];
+                    }
+                    else {
+                        // the iteratively built string has to be reversed to give the expected ceteId
+                        ceteId = reversedCeteId.split('').reverse().join('');
+                        resolve(ceteId);
+                    }
+                }
+                reject();
             });
         });
     }

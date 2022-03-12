@@ -8,33 +8,33 @@
 
     public timestamp: string;
     public route: string;
-    private data: Record<string, unknown>;
+    private resource: Record<string, unknown>;
 
-    constructor(timestamp: string, route: string, data: Record<string, unknown>) {
+    constructor(timestamp: string, route: string, resource: Record<string, unknown>) {
         this.timestamp = timestamp;
         this.route = route;
-        this.data = data;
+        this.resource = resource;
     }
 
     /**
      * Public access methods
      */
-    public getData(): Record<string, unknown> {
-        return this.data;
+    public getResource(): Record<string, unknown> {
+        return this.resource;
     }
     public getDictionary(): Record<string, unknown> { // dictionary return type
         return {
             timestamp: this.timestamp,
             route: this.route,
-            data: this.getData()
+            resource: this.getResource()
         }
     }
 
     /**
      * Public setter methods
      */
-    public setData(newData: Record<string, unknown>) {
-        this.data = newData;
+    public setResource(newResource: Record<string, unknown>) {
+        this.resource = newResource;
     }
 
 }

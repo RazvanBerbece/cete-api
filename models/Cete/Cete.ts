@@ -9,13 +9,40 @@
  */
 import DBClient from "../AzureCosmosDBClient/DBClient";
 
-type CeteDict = {
+export type CeteDict = {
     id: string,
     userId: string,
     timestamp: Date,
     data: {
         audioData: string,
         filepath: string
+    },
+    isArchived: boolean
+};
+
+export type CeteDictIndexing = {
+    id: string,
+    userId: string,
+    timestamp: Date,
+    data: {
+        filepath: string
+    },
+    isArchived: boolean
+};
+
+export type CeteDictProfile = {
+    id: string,
+    userId: string,
+    timestamp: Date,
+    isArchived: boolean
+};
+
+export type CeteDictWithData = {
+    id: string,
+    userId: string,
+    timestamp: Date,
+    data: {
+        audioData: string,
     },
     isArchived: boolean
 };
@@ -79,8 +106,8 @@ class Cete {
     }
     public setFilePath() {
         // filepath is of form:
-        //      1. Cetes/userId/public/ceteId.mp3,      when isArchived = false
-        //      2. Cetes/userId/archived/ceteId.mp3,    when isArchived = true 
+        //      1. Cetes/userId/public/ceteId.wav,      when isArchived = false
+        //      2. Cetes/userId/archived/ceteId.wav,    when isArchived = true 
         // Only set filepath if userId and ceteId are set
         if (!this.getCeteId() || !this.getUserId()) {
             return Error("Cannot process path for a Cete without a userId and a ceteId");
@@ -99,7 +126,44 @@ class Cete {
                 filepath: this.getFilePath()
             },
             isArchived: this.getisArchived()
-        }
+        };
+    }
+
+    public getCeteDictWithData(): CeteDictWithData {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            data: {
+                audioData: this.getData(),
+            },
+            isArchived: this.getisArchived()
+        };
+    }
+
+    public getDictForProfile(): CeteDictProfile {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            isArchived: this.getisArchived()
+        };
+    }
+
+    /**
+     * Get a dictionary representation of the Cete but without the audioData field
+     * @returns Indexing-friendly dict of a Cete (drops the audioData field)
+     */
+    public getIndexingDict(): CeteDictIndexing {
+        return {
+            id: this.getCeteId(),
+            userId: this.getUserId(),
+            timestamp: this.getTimestamp(),
+            data: {
+                filepath: this.getFilePath()
+            },
+            isArchived: this.getisArchived()
+        };
     }
 
     /**
@@ -115,6 +179,7 @@ class Cete {
     public static processAndStoreCete(cete: Cete): Promise<string[]> {
 
         return new Promise((resolve, reject) => {
+
             // Connect to Azure DB using the DBClient internal API
             const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 

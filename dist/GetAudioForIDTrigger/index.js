@@ -17,31 +17,28 @@ const BlobClient_1 = __importDefault(require("../models/AzureBlobStorageClient/B
 const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log('HTTP trigger function (v1/get/audio) is processing a GET request.');
+        context.log('HTTP trigger function (v1/get/cete/id) is processing a GET request.');
         // Get query params
         const userId = context.req.query.userId;
+        const ceteId = context.req.query.ceteId;
         const archived = context.req.query.archived;
-        let limitCount = parseInt(context.req.query.limit);
-        if (typeof userId === 'undefined' || typeof archived === 'undefined') {
+        if (typeof ceteId === 'undefined' || typeof archived === 'undefined' || typeof userId === 'undefined') {
             context.res = {
-                status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_UID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }),
+                status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `InvalidRequestNoCeteIDOrVisibility : GET Request has no Cete ID, user ID or visibility query parameter` }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
             };
         }
         else {
-            if (typeof limitCount === 'undefined') {
-                limitCount = 9; // works in increments of 9, maybe it can help client-side and pagination
-            }
             // Instantiate Blob Storage client and get data
             const blobClient = new BlobClient_1.default('cetes');
-            const cetesDownloadResult = yield blobClient.downloadCetesDataForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
-            if (cetesDownloadResult instanceof Error) {
+            const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId, (archived === 'true')); // convert 'archive' var to a boolean
+            if (ceteDownloadResult instanceof Error) {
                 context.res = {
-                    status: statuses_js_1.default.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `ServerErrorGetFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
+                    status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `ServerErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -50,9 +47,9 @@ const httpTrigger = function (context) {
             else {
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', {
-                        message: `Downloaded ${cetesDownloadResult.length} cetes for user ${userId}`,
-                        data: cetesDownloadResult
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', {
+                        message: `Downloaded cete data for user ${userId}`,
+                        data: ceteDownloadResult
                     }),
                     headers: {
                         'Content-Type': 'application/json'

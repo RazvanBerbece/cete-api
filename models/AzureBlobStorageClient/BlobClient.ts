@@ -5,8 +5,11 @@
  * Handles connection, uploading & downloading data and returning useful outputs
  * 
  */
-import { BlobClient, BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import { FeedResponse } from "@azure/cosmos";
+import { BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import DBClient from "../AzureCosmosDBClient/DBClient";
 import Cete from "../Cete/Cete";
+import { CeteDictWithData } from "../Cete/Cete";
 
 class StorageBlobClient {
 
@@ -27,9 +30,10 @@ class StorageBlobClient {
 
     }
 
-    /* Uploads audio data (base64 encoded) from the cete argument to a Blob on Azure with an audio/wav content-type.
+    /** 
+     * Uploads audio data (base64 encoded) from the cete argument to a Blob on Azure with an audio/wav content-type.
      * @param cete - cete to be uplaoded to Blob
-     * @returns - 1 if successful, Error if failed
+     * @returns 1 if successful, Error if failed
      */
     public async uploadCeteToWAVBlob(cete: Cete): Promise<1 | Error> {
 
@@ -88,9 +92,9 @@ class StorageBlobClient {
      * @param archived - whether to get publicly visible cetes or archived ones
      * @returns number of cetes downloaded, Error if failed
      */
-    public async downloadCetesDataForUserIdFromWAVBlob(userId: string, archived: boolean, limit: number): Promise<BlobItem[] | Error> {
+    public async downloadCetesDataForProfile(userId: string, archived: boolean, limit: number): Promise<Cete[] | Error> {
 
-        const cetes = [];
+        const cetes = []; // will be returned and will hold Cete objects under userId with the given visibility
 
         try {
 
@@ -100,13 +104,39 @@ class StorageBlobClient {
             }
             else {
                 for (let i = 0; i < getMetadataResult.length; ++i) {
-                    // Get a block blob client for current blob in iteration
+
+                    // Populate a Cete object to be added to the list of objects
+                    const ceteObj = new Cete();
+
+                    // Get a block blob client for current blob in iteration & download
                     const blockBlobClient = this.blobContainerClient.getBlockBlobClient(getMetadataResult[i].name);
                     const downloadBlockBlobResponse = await blockBlobClient.download(0);
-                    cetes.push(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody))
+
+                    // Set data of the ceteObj with the string streamed from the .download() result
+                    ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+
+                    // Set ceteObj fields
+                    ceteObj.setIsArchived(archived);
+                    ceteObj.setUserId(userId);
+
+                    // Get CeteId from BlobItem name
+                    ceteObj.setCeteId(await StorageBlobClient.getCeteIdFromBlobItem(getMetadataResult[i]));
+                    
+                    // Connect to Azure DB using the DBClient internal API
+                    const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+
+                    // Get Cete timestamp
+                    await database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
+                    .then((response: FeedResponse<any>) => {
+                        ceteObj.setTimestamp(response["timestamp"]);
+                        cetes.push(ceteObj.getDictForProfile());
+                    })
+                    .catch(() => {
+                        return Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`)
+                    });
+
                 }
 
-                console.log(cetes);
                 return cetes;
             }
         }
@@ -116,21 +146,101 @@ class StorageBlobClient {
 
     }
 
+    public async downloadCeteFromWAVBlob(userId: string, ceteId: string, archived: boolean): Promise<CeteDictWithData | Error> {
+        return new Promise((resolve, reject) => {
+            try {
+
+                let filepath: string;
+    
+                // Connect to Azure DB using the DBClient internal API
+                const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+    
+                // Get Cete Filepath from indexing
+                database_client.getCetefromCeteIndexing(ceteId)
+                .then(async (response: FeedResponse<any>) => {
+    
+                    filepath = response["data"]["filepath"];
+                    
+                    // Populate a Cete object to be added to the list of objects
+                    const ceteObj = new Cete();
+    
+                    // Get a block blob client for current blob in iteration & download
+                    const blockBlobClient = this.blobContainerClient.getBlockBlobClient(filepath);
+                    const downloadBlockBlobResponse = await blockBlobClient.download(0);
+    
+                    // Set data of the ceteObj with the string streamed from the .download() result
+                    ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+    
+                    // Set ceteObj fields
+                    ceteObj.setIsArchived(archived);
+                    ceteObj.setUserId(userId);
+    
+                    // Get CeteId from BlobItem name
+                    ceteObj.setCeteId(ceteId);
+    
+                    // Get Cete timestamp
+                    await database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
+                    .then((response: FeedResponse<any>) => {
+                        ceteObj.setTimestamp(response["timestamp"]);
+                        resolve(ceteObj.getCeteDictWithData());
+                    })
+                    .catch(() => {
+                        reject(Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`));
+                    });
+                })
+                .catch(() => {
+                    reject(Error(`ServerErrorGetIdFromIndexing : Failed to get audio data for cete with id ${ceteId}`));
+                });
+            }
+            catch (err) {
+                reject(Error(`${err}`));
+            }
+        });
+    }
+
     /**
      * UTILS
      */
-     public static async streamToString(readableStream) {
+     public static async streamToString(readableStream: NodeJS.ReadableStream): Promise<string> {
         return new Promise((resolve, reject) => {
             const chunks = [];
+
             readableStream.on("data", (data) => {
                 chunks.push(data.toString());
             });
-        readableStream.on("end", () => {
-            resolve(chunks.join(""));
+
+            readableStream.on("end", () => {
+                resolve(chunks.join(""));
+            });
+
+            readableStream.on("error", reject);
         });
-        readableStream.on("error", reject);
+    }
+    /**
+     * Returns the ceteId of a BlobItem using the .name field
+     * @param blobItem - BlobItem object used to get ceteId from
+     * @returns ceteId
+     */
+    public static async getCeteIdFromBlobItem(blobItem: BlobItem): Promise<string> {
+        return new Promise((resolve, reject) => {
+            let ceteId: string;
+            const filepath = blobItem.name;
+            // Iterate backwards through string and create ceteId between '.wav' and the last '/' (/ceteId.wav)
+            // Skip the .wav right to left
+            let reversedCeteId= '';
+            for (let i = filepath.length - 5; i >= 0; i--) {
+                if (filepath[i] != '/') {
+                    reversedCeteId += filepath[i];
+                }
+                else {
+                    // the iteratively built string has to be reversed to give the expected ceteId
+                    ceteId = reversedCeteId.split('').reverse().join('');
+                    resolve(ceteId);
+                }
+            } 
+            reject();
         });
-   }
+    }
 
 }
 

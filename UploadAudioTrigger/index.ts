@@ -16,7 +16,7 @@ dotenv.config();
  */
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
 
-    context.log('HTTP trigger function (v1/upload/audio) is processing a POST request.');
+    context.log('HTTP trigger function (v1/upload/profile/cete) is processing a POST request.');
 
     // TODO: Authenticate POST request
 
@@ -25,7 +25,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             status: STATUS_CODES.CLIENT_INVALID_REQUEST_NO_BODY, 
             body: new Response(
                 new Date().toLocaleString(), 
-                '/api/v1/upload/audio', 
+                'api/v1/upload/profile/cete', 
                 { 
                     error: `InvalidRequestNoBody : POST Request has no body.` 
                 }
@@ -39,7 +39,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             status: STATUS_CODES.CLIENT_INVALID_REQUEST_NO_DATA, 
             body: new Response(
                 new Date().toLocaleString(), 
-                '/api/v1/upload/audio', 
+                'api/v1/upload/profile/cete', 
                 { 
                     error: `InvalidRequestNoData : POST Request body has no data.` 
                 }
@@ -65,7 +65,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 status: STATUS_CODES.SERVER_DB_ERROR,
                 body: new Response(
                     new Date().toLocaleString(), 
-                    '/api/v1/upload/audio', 
+                    'api/v1/upload/profile/cete', 
                     { 
                         error: `ServerDBError: Server could not upload Cete metadata to database. ${indexingOutput[1]}.`,
                     }
@@ -80,7 +80,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 status: 200,
                 body: new Response(
                     new Date().toLocaleString(), 
-                    '/api/v1/upload/audio', 
+                    'api/v1/upload/profile/cete', 
                     { 
                         message: `Uploaded Cete metadata to database successfully.`,
                         ceteId: ceteObj.getCeteId() 
