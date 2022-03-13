@@ -139,6 +139,13 @@ class StorageBlobClient {
             }
         });
     }
+    /**
+     * Downloads cete audioData from the WAV Blob using the filepath stored in the CosmosDB Indexing
+     * @param userId - id of user downloading the cete data
+     * @param ceteId - id of cete data to be downloaded
+     * @param archived - visibility of cete
+     * @returns CeteDictWithData if successful, Error if failed
+     */
     downloadCeteFromWAVBlob(userId, ceteId, archived) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
