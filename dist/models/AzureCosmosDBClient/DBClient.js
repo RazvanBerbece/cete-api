@@ -48,14 +48,15 @@ class DBClient {
      */
     updateCeteInCeteIndexing(updatedCete) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { resource: updatedItemFromUpstream } = yield this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict());
-                // console.log(updatedItemFromUpstream);
-                return;
-            }
-            catch (err) {
-                return Error(`${err}`);
-            }
+            return new Promise((resolve, reject) => {
+                this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
+                    .then((result) => {
+                    resolve(result.resource);
+                })
+                    .catch((err) => {
+                    reject(err);
+                });
+            });
         });
     }
     /**
@@ -84,19 +85,24 @@ class DBClient {
             try {
                 const { resource: createdItem } = yield this.container.items.create(cete.getIndexingDict());
                 cete.setCeteId(createdItem.id);
-                const setFilePathStatus = cete.setFilePath();
+                const setFilePathStatus = cete.processFilePath();
                 if (setFilePathStatus != 1) { // setFilePath() failed, return Error message
                     return ["NaN", setFilePathStatus.message];
                 }
                 // Update Cete in CosmosDB table with the generated filepath
-                this.updateCeteInCeteIndexing(cete);
-                // Upload Cete data to WAV Blob
-                const blobClient = new BlobClient_1.default("cetes");
-                const uploadOpStatus = yield blobClient.uploadCeteToWAVBlob(cete);
-                if (uploadOpStatus != 1) {
-                    return ["NaN", uploadOpStatus.message];
-                }
-                return [cete.getCeteId(), ""];
+                this.updateCeteInCeteIndexing(cete)
+                    .then(() => __awaiter(this, void 0, void 0, function* () {
+                    // Upload Cete data to WAV Blob
+                    const blobClient = new BlobClient_1.default("cetes");
+                    const uploadOpStatus = yield blobClient.uploadCeteToWAVBlob(cete);
+                    if (uploadOpStatus != 1) {
+                        return ["NaN", uploadOpStatus.message];
+                    }
+                    return [cete.getCeteId(), ""];
+                }))
+                    .catch((err) => {
+                    return ["NaN", err];
+                });
             }
             catch (err) {
                 return ["NaN", err];

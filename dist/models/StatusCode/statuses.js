@@ -13,6 +13,7 @@ const STATUS_CODES = {
     SERVER_DB_ERROR: 513,
     SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB: 514,
     SERVER_GET_AUDIO_DATA_FROM_BLOB: 515,
+    SERVER_LISTEN_AUDIO: 516
 };
 exports.default = STATUS_CODES;
 //# sourceMappingURL=statuses.js.map

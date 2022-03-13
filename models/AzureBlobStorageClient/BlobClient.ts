@@ -32,7 +32,7 @@ class StorageBlobClient {
 
     /** 
      * Uploads audio data (base64 encoded) from the cete argument to a Blob on Azure with an audio/wav content-type.
-     * @param cete - cete to be uplaoded to Blob
+     * @param cete - cete to be uploaded to Blob
      * @returns 1 if successful, Error if failed
      */
     public async uploadCeteToWAVBlob(cete: Cete): Promise<1 | Error> {
@@ -92,11 +92,14 @@ class StorageBlobClient {
      * @param archived - whether to get publicly visible cetes or archived ones
      * @returns number of cetes downloaded, Error if failed
      */
-    public async downloadCetesDataForProfile(userId: string, archived: boolean, limit: number): Promise<Cete[] | Error> {
+    public async downloadCetesForProfile(userId: string, archived: boolean, limit: number): Promise<Cete[] | Error> {
 
         const cetes = []; // will be returned and will hold Cete objects under userId with the given visibility
 
         try {
+
+            // Connect to Azure DB using the DBClient internal API
+            const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
             const getMetadataResult = await this.getCetesMetadataForUserIdFromWAVBlob(userId, archived, limit);
             if (getMetadataResult instanceof Error) {
@@ -115,15 +118,12 @@ class StorageBlobClient {
                     // Set data of the ceteObj with the string streamed from the .download() result
                     ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
 
-                    // Set ceteObj fields
-                    ceteObj.setIsArchived(archived);
-                    ceteObj.setUserId(userId);
-
                     // Get CeteId from BlobItem name
                     ceteObj.setCeteId(await StorageBlobClient.getCeteIdFromBlobItem(getMetadataResult[i]));
-                    
-                    // Connect to Azure DB using the DBClient internal API
-                    const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+
+                    // Set remaining ceteObj fields
+                    ceteObj.setIsArchived(archived);
+                    ceteObj.setUserId(userId);
 
                     // Get Cete timestamp
                     await database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
@@ -190,6 +190,7 @@ class StorageBlobClient {
                     .then((response: FeedResponse<any>) => {
                         ceteObj.setTimestamp(response["timestamp"]);
                         resolve(ceteObj.getCeteDictWithData());
+
                     })
                     .catch(() => {
                         reject(Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`));

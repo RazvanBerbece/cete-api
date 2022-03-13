@@ -6,7 +6,8 @@ export type CeteDict = {
         audioData: string,
         filepath: string
     },
-    isArchived: boolean
+    isArchived: boolean,
+    listens: number
 };
 
 export type CeteDictIndexing = {
@@ -16,14 +17,16 @@ export type CeteDictIndexing = {
     data: {
         filepath: string
     },
-    isArchived: boolean
+    isArchived: boolean,
+    listens: number
 };
 
 export type CeteDictProfile = {
     id: string,
     userId: string,
     timestamp: Date,
-    isArchived: boolean
+    isArchived: boolean,
+    listens: number
 };
 
 export type CeteDictWithData = {
@@ -33,5 +36,6 @@ export type CeteDictWithData = {
     data: {
         audioData: string,
     },
-    isArchived: boolean
+    isArchived: boolean,
+    listens: number
 };
