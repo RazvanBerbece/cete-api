@@ -31,24 +31,24 @@ describe('CLASS Cete', function () {
             const ceteObj_public = new Cete_1.default();
             ceteObj_public.setCeteId(example_ceteId);
             ceteObj_public.setUserId(example_userId);
-            ceteObj_public.setFilePath();
+            ceteObj_public.processFilePath();
             assert_1.default.strictEqual(ceteObj_public.getFilePath(), "testUsedId123/public/123456789abcdef.wav", "setFilePath() for public Cete failed to create the correct path");
             // Cete with 'archived' status
             const ceteObj_archived = new Cete_1.default();
             ceteObj_archived.setCeteId(example_ceteId);
             ceteObj_archived.setUserId(example_userId);
             ceteObj_archived.setIsArchived(true);
-            ceteObj_archived.setFilePath();
+            ceteObj_archived.processFilePath();
             assert_1.default.strictEqual(ceteObj_archived.getFilePath(), "testUsedId123/archived/123456789abcdef.wav", "setFilePath() for archived Cete failed to create the correct path");
             // Cete with missing details (userId)
             const ceteObj_missing_userId = new Cete_1.default();
             ceteObj_missing_userId.setCeteId(example_ceteId);
-            const status_missing_userId = ceteObj_missing_userId.setFilePath();
+            const status_missing_userId = ceteObj_missing_userId.processFilePath();
             assert_1.default.notStrictEqual(status_missing_userId, 1, "setFilePath() for Cete with missing details (userId) failed to return Error");
             // Cete with missing details (ceteId)
             const ceteObj_missing_ceteId = new Cete_1.default();
             ceteObj_missing_ceteId.setUserId(example_userId);
-            const ceteObj_missing_ceteId_status = ceteObj_missing_ceteId.setFilePath();
+            const ceteObj_missing_ceteId_status = ceteObj_missing_ceteId.processFilePath();
             assert_1.default.notStrictEqual(ceteObj_missing_ceteId_status, 1, "setFilePath() for Cete with missing details (ceteId) failed to return Error");
         });
     });

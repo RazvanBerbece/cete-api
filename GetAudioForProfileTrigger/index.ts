@@ -33,7 +33,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
     
         // Instantiate Blob Storage client and get data
         const blobClient = new StorageBlobClient('cetes');
-        const cetesDownloadResult = await blobClient.downloadCetesDataForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
+        const cetesDownloadResult = await blobClient.downloadCetesForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
 
         if (cetesDownloadResult instanceof Error) {
             context.res = {

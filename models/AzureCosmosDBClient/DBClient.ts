@@ -8,6 +8,7 @@
 import { Container, CosmosClient, Database, SqlQuerySpec } from "@azure/cosmos";
 import StorageBlobClient from "../AzureBlobStorageClient/BlobClient";
 import Cete from "../Cete/Cete";
+import { CeteDictIndexing } from "../Cete/CeteTypes";
 
 class DBClient {
 
@@ -43,15 +44,16 @@ class DBClient {
      * @param updatedCete - Cete with existing ceteId to be updated. Uses the rest of the object fields to update
      * @returns void, err if error occurs while updating the Cete
      */
-    public async updateCeteInCeteIndexing(updatedCete: Cete): Promise<void | Error> {
-        try {
-            const { resource: updatedItemFromUpstream } = await this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
-            // console.log(updatedItemFromUpstream);
-            return;
-        }
-        catch (err) {
-            return Error(`${err}`);
-        }
+    public async updateCeteInCeteIndexing(updatedCete: Cete): Promise<CeteDictIndexing | Error> {
+        return new Promise((resolve, reject) => {
+            this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
+            .then((result) => {
+                resolve(result.resource);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
     }
 
     /**
@@ -79,22 +81,25 @@ class DBClient {
             const { resource: createdItem } = await this.container.items.create(cete.getIndexingDict());
 
             cete.setCeteId(createdItem.id);
-            const setFilePathStatus = cete.setFilePath();
+            const setFilePathStatus = cete.processFilePath();
             if (setFilePathStatus != 1) { // setFilePath() failed, return Error message
                 return ["NaN", setFilePathStatus.message];
             }
 
             // Update Cete in CosmosDB table with the generated filepath
             this.updateCeteInCeteIndexing(cete)
-
-            // Upload Cete data to WAV Blob
-            const blobClient = new StorageBlobClient("cetes");
-            const uploadOpStatus = await blobClient.uploadCeteToWAVBlob(cete);
-            if (uploadOpStatus != 1) {
-                return ["NaN", uploadOpStatus.message];
-            }
-
-            return [cete.getCeteId(), ""];
+            .then(async () => {
+                // Upload Cete data to WAV Blob
+                const blobClient = new StorageBlobClient("cetes");
+                const uploadOpStatus = await blobClient.uploadCeteToWAVBlob(cete);
+                if (uploadOpStatus != 1) {
+                    return ["NaN", uploadOpStatus.message];
+                }
+                return [cete.getCeteId(), ""];
+            })
+            .catch((err) => {
+                return ["NaN", err];
+            });
         }
         catch (err) {
             return ["NaN", err];

@@ -1,3 +1,7 @@
+/**
+ * Endpoint for detailed view of a Cete
+ */
+
 import { AzureFunction, Context } from "@azure/functions"
 import Response from "../models/Response/Response.js";
 import StorageBlobClient from "../models/AzureBlobStorageClient/BlobClient";
