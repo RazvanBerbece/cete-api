@@ -29,7 +29,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 { 
                     error: `InvalidRequestNoBody : POST Request has no body.` 
                 }
-            )
+            ),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         };
     }
 
@@ -43,7 +46,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 { 
                     error: `InvalidRequestNoData : POST Request body has no data.` 
                 }
-            )
+            ),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         };
     }
 

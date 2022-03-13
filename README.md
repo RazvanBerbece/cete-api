@@ -8,7 +8,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 # 1 Progress
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~, v1/get/feed)
+[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~, v1/view/cete, v1/get/feed)
 
 [~] CI/CD (testing, ~deployment~)
 

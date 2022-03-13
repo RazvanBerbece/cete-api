@@ -37,7 +37,7 @@ const httpTrigger = function (context) {
             }
             // Instantiate Blob Storage client and get data
             const blobClient = new BlobClient_1.default('cetes');
-            const cetesDownloadResult = yield blobClient.downloadCetesDataForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
+            const cetesDownloadResult = yield blobClient.downloadCetesForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
             if (cetesDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,

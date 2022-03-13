@@ -17,6 +17,7 @@ class Cete {
     constructor() {
         this.isArchived = false;
         this.filepath = 'NaN';
+        this.listens = 0;
     }
     /**
      * Public access methods for Cete fields
@@ -39,6 +40,9 @@ class Cete {
     getFilePath() {
         return this.filepath;
     }
+    getListens() {
+        return this.listens;
+    }
     /**
      * Public setter methods for Cete fields
      */
@@ -57,7 +61,10 @@ class Cete {
     setIsArchived(newIsArchived) {
         this.isArchived = newIsArchived;
     }
-    setFilePath() {
+    setFilePath(newFilePath) {
+        this.filepath = newFilePath;
+    }
+    processFilePath() {
         // filepath is of form:
         //      1. Cetes/userId/public/ceteId.wav,      when isArchived = false
         //      2. Cetes/userId/archived/ceteId.wav,    when isArchived = true 
@@ -68,6 +75,12 @@ class Cete {
         this.filepath = this.getisArchived() ? `${this.getUserId()}/archived/${this.getCeteId()}.wav` : `${this.getUserId()}/public/${this.getCeteId()}.wav`;
         return 1;
     }
+    setListens(newListens) {
+        this.listens = newListens;
+    }
+    incrementListens() {
+        this.listens += 1;
+    }
     getDict() {
         return {
             id: this.getCeteId(),
@@ -77,7 +90,8 @@ class Cete {
                 audioData: this.getData(),
                 filepath: this.getFilePath()
             },
-            isArchived: this.getisArchived()
+            isArchived: this.getisArchived(),
+            listens: this.getListens()
         };
     }
     getCeteDictWithData() {
@@ -88,7 +102,8 @@ class Cete {
             data: {
                 audioData: this.getData(),
             },
-            isArchived: this.getisArchived()
+            isArchived: this.getisArchived(),
+            listens: this.getListens()
         };
     }
     getDictForProfile() {
@@ -96,7 +111,8 @@ class Cete {
             id: this.getCeteId(),
             userId: this.getUserId(),
             timestamp: this.getTimestamp(),
-            isArchived: this.getisArchived()
+            isArchived: this.getisArchived(),
+            listens: this.getListens()
         };
     }
     /**
@@ -111,7 +127,8 @@ class Cete {
             data: {
                 filepath: this.getFilePath()
             },
-            isArchived: this.getisArchived()
+            isArchived: this.getisArchived(),
+            listens: this.getListens()
         };
     }
     /**

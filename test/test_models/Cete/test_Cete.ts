@@ -32,7 +32,7 @@ describe('CLASS Cete', function() {
         const ceteObj_public = new Cete()
         ceteObj_public.setCeteId(example_ceteId);
         ceteObj_public.setUserId(example_userId);
-        ceteObj_public.setFilePath();
+        ceteObj_public.processFilePath();
         assert.strictEqual(
           ceteObj_public.getFilePath(), 
           "testUsedId123/public/123456789abcdef.wav", 
@@ -44,7 +44,7 @@ describe('CLASS Cete', function() {
         ceteObj_archived.setCeteId(example_ceteId);
         ceteObj_archived.setUserId(example_userId);
         ceteObj_archived.setIsArchived(true);
-        ceteObj_archived.setFilePath();
+        ceteObj_archived.processFilePath();
         assert.strictEqual(
           ceteObj_archived.getFilePath(), 
           "testUsedId123/archived/123456789abcdef.wav", 
@@ -54,7 +54,7 @@ describe('CLASS Cete', function() {
         // Cete with missing details (userId)
         const ceteObj_missing_userId = new Cete()
         ceteObj_missing_userId.setCeteId(example_ceteId);
-        const status_missing_userId = ceteObj_missing_userId.setFilePath();
+        const status_missing_userId = ceteObj_missing_userId.processFilePath();
         assert.notStrictEqual(
           status_missing_userId,
           1,
@@ -64,7 +64,7 @@ describe('CLASS Cete', function() {
         // Cete with missing details (ceteId)
         const ceteObj_missing_ceteId = new Cete()
         ceteObj_missing_ceteId.setUserId(example_userId);
-        const ceteObj_missing_ceteId_status = ceteObj_missing_ceteId.setFilePath();
+        const ceteObj_missing_ceteId_status = ceteObj_missing_ceteId.processFilePath();
         assert.notStrictEqual(
           ceteObj_missing_ceteId_status,
           1,

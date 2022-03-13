@@ -34,7 +34,10 @@ const httpTrigger = function (context, req) {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_BODY,
                 body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
                     error: `InvalidRequestNoBody : POST Request has no body.`
-                })
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             };
         }
         const resultData = JSON.parse(req.rawBody); // parse rawBody string data (POST JSON) to JSON object
@@ -43,7 +46,10 @@ const httpTrigger = function (context, req) {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_DATA,
                 body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
                     error: `InvalidRequestNoData : POST Request body has no data.`
-                })
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             };
         }
         // Request has visible data, so create object & set object fields using the public access methods
