@@ -21,6 +21,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const cosmos_1 = require("@azure/cosmos");
 const BlobClient_1 = __importDefault(require("../AzureBlobStorageClient/BlobClient"));
+const Cete_1 = __importDefault(require("../Cete/Cete"));
 class DBClient {
     /**
      * Creates a CosmosDB Client using the environment variable for the connection string
@@ -141,7 +142,16 @@ class DBClient {
             const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE c.id='${ceteId}'`);
             this.container.items.query(querySelectSpec).fetchAll()
                 .then((result) => {
-                resolve(result.resources[0]);
+                const ceteData = result.resources[0];
+                // Build Cete object from upstream
+                const cete = new Cete_1.default();
+                cete.setCeteId(ceteId);
+                cete.setTimestamp(ceteData.timestamp);
+                cete.setUserId(ceteData.userId);
+                cete.setIsArchived(ceteData.isArchived);
+                cete.setListens(ceteData.listens);
+                cete.setFilePath(ceteData.data.filepath);
+                resolve(cete);
             })
                 .catch((err) => {
                 reject(err);

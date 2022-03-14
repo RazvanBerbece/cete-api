@@ -19,6 +19,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * CLASS StorageBlobClient
+ * API for the Azure Storage Container (Blob Storage) tool suite
+ *
+ * Handles connection, uploading & downloading data and returning useful outputs
+ *
+ */
 const storage_blob_1 = require("@azure/storage-blob");
 const DBClient_1 = __importDefault(require("../AzureCosmosDBClient/DBClient"));
 const Cete_1 = __importDefault(require("../Cete/Cete"));
@@ -92,6 +99,8 @@ class StorageBlobClient {
         });
     }
     /**
+     * Can add partial data downlaod for a server-processed thumbnail (to investigate)
+     *
      * Downloads a list of items from the Azure blobs under userId
      * @param userId - the downloaded cetes will haven been posted by the user with userId
      * @param archived - whether to get publicly visible cetes or archived ones
@@ -111,20 +120,21 @@ class StorageBlobClient {
                     for (let i = 0; i < getMetadataResult.length; ++i) {
                         // Populate a Cete object to be added to the list of objects
                         const ceteObj = new Cete_1.default();
-                        // Get a block blob client for current blob in iteration & download
-                        const blockBlobClient = this.blobContainerClient.getBlockBlobClient(getMetadataResult[i].name);
-                        const downloadBlockBlobResponse = yield blockBlobClient.download(0);
-                        // Set data of the ceteObj with the string streamed from the .download() result
-                        ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
+                        // // Get a block blob client for current blob in iteration & download
+                        // const blockBlobClient = this.blobContainerClient.getBlockBlobClient(getMetadataResult[i].name);
+                        // const downloadBlockBlobResponse = await blockBlobClient.download(0);
+                        // // Set data of the ceteObj with the string streamed from the .download() result
+                        // ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
                         // Get CeteId from BlobItem name
                         ceteObj.setCeteId(yield StorageBlobClient.getCeteIdFromBlobItem(getMetadataResult[i]));
                         // Set remaining ceteObj fields
-                        ceteObj.setIsArchived(archived);
                         ceteObj.setUserId(userId);
                         // Get Cete timestamp
                         yield database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
                             .then((response) => {
-                            ceteObj.setTimestamp(response["timestamp"]);
+                            ceteObj.setTimestamp(response.getTimestamp());
+                            ceteObj.setListens(response.getListens());
+                            ceteObj.setIsArchived(response.getisArchived());
                             cetes.push(ceteObj.getDictForProfile());
                         })
                             .catch(() => {
@@ -143,20 +153,19 @@ class StorageBlobClient {
      * Downloads cete audioData from the WAV Blob using the filepath stored in the CosmosDB Indexing
      * @param userId - id of user downloading the cete data
      * @param ceteId - id of cete data to be downloaded
-     * @param archived - visibility of cete
      * @returns CeteDictWithData if successful, Error if failed
      */
-    downloadCeteFromWAVBlob(userId, ceteId, archived) {
+    downloadCeteFromWAVBlob(userId, ceteId) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 try {
                     let filepath;
                     // Connect to Azure DB using the DBClient internal API
                     const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
-                    // Get Cete Filepath from indexing
+                    // Get Cete Filepath & timestamp from indexing
                     database_client.getCetefromCeteIndexing(ceteId)
                         .then((response) => __awaiter(this, void 0, void 0, function* () {
-                        filepath = response["data"]["filepath"];
+                        filepath = response.getFilePath();
                         // Populate a Cete object to be added to the list of objects
                         const ceteObj = new Cete_1.default();
                         // Get a block blob client for current blob in iteration & download
@@ -165,22 +174,15 @@ class StorageBlobClient {
                         // Set data of the ceteObj with the string streamed from the .download() result
                         ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
                         // Set ceteObj fields
-                        ceteObj.setIsArchived(archived);
+                        ceteObj.setIsArchived(response.getisArchived());
                         ceteObj.setUserId(userId);
-                        // Get CeteId from BlobItem name
                         ceteObj.setCeteId(ceteId);
-                        // Get Cete timestamp
-                        yield database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
-                            .then((response) => {
-                            ceteObj.setTimestamp(response["timestamp"]);
-                            resolve(ceteObj.getCeteDictWithData());
-                        })
-                            .catch(() => {
-                            reject(Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`));
-                        });
+                        ceteObj.setTimestamp(response.getTimestamp());
+                        ceteObj.setListens(response.getListens());
+                        resolve(ceteObj.getCeteDictWithData());
                     }))
-                        .catch(() => {
-                        reject(Error(`ServerErrorGetIdFromIndexing : Failed to get audio data for cete with id ${ceteId}`));
+                        .catch((err) => {
+                        reject(Error(`ServerErrorGetIdFromIndexing : ${err} ~> Failed to get audio data for cete with id ${ceteId}`));
                     });
                 }
                 catch (err) {
