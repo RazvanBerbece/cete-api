@@ -136,12 +136,24 @@ class DBClient {
      * @param ceteId - id of cete to be downloaded
      * @returns cete object as in CosmosDB
      */
-    public getCetefromCeteIndexing(ceteId: string) {
+    public getCetefromCeteIndexing(ceteId: string): Promise<Cete> {
         return new Promise((resolve, reject) => {
             const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE c.id='${ceteId}'`);
             this.container.items.query(querySelectSpec).fetchAll()
             .then((result) => {
-                resolve(result.resources[0]);
+
+                const ceteData = result.resources[0];
+
+                // Build Cete object from upstream
+                const cete = new Cete();
+                cete.setCeteId(ceteId);
+                cete.setTimestamp(ceteData.timestamp);
+                cete.setUserId(ceteData.userId);
+                cete.setIsArchived(ceteData.isArchived);
+                cete.setListens(ceteData.listens);
+                cete.setFilePath(ceteData.data.filepath)
+
+                resolve(cete);
             })
             .catch((err) => {
                 reject(err);

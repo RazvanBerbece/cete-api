@@ -14,15 +14,14 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
     // Get query params
     const userId = context.req.query.userId;
     const ceteId = context.req.query.ceteId;
-    const archived = context.req.query.archived;
     
-    if (typeof ceteId === 'undefined' || typeof archived === 'undefined' || typeof userId === 'undefined') {
+    if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
         context.res = {
             status: STATUS_CODES.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/cete/id', 
-                { message: `InvalidRequestNoCeteIDOrVisibility : GET Request has no Cete ID, user ID or visibility query parameter` }
+                { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -32,7 +31,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
     else {    
         // Instantiate Blob Storage client and get data
         const blobClient = new StorageBlobClient('cetes');
-        const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(userId, ceteId, (archived === 'true')); // convert 'archive' var to a boolean
+        const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(userId, ceteId);
         if (ceteDownloadResult instanceof Error) {
             context.res = {
                 status: STATUS_CODES.SERVER_GET_AUDIO_DATA_FROM_BLOB,
@@ -53,7 +52,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     new Date().toLocaleString(), 
                     'api/v1/get/cete/id', 
                     { 
-                        message: `Downloaded cete data for user ${userId}`,
+                        message: `Downloaded cete data for cete with id ${ceteId}`,
                         data: ceteDownloadResult
                     }
                 ),

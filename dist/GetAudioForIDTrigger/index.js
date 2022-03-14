@@ -24,11 +24,10 @@ const httpTrigger = function (context) {
         // Get query params
         const userId = context.req.query.userId;
         const ceteId = context.req.query.ceteId;
-        const archived = context.req.query.archived;
-        if (typeof ceteId === 'undefined' || typeof archived === 'undefined' || typeof userId === 'undefined') {
+        if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `InvalidRequestNoCeteIDOrVisibility : GET Request has no Cete ID, user ID or visibility query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -37,7 +36,7 @@ const httpTrigger = function (context) {
         else {
             // Instantiate Blob Storage client and get data
             const blobClient = new BlobClient_1.default('cetes');
-            const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId, (archived === 'true')); // convert 'archive' var to a boolean
+            const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId);
             if (ceteDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
@@ -51,7 +50,7 @@ const httpTrigger = function (context) {
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', {
-                        message: `Downloaded cete data for user ${userId}`,
+                        message: `Downloaded cete data for cete with id ${ceteId}`,
                         data: ceteDownloadResult
                     }),
                     headers: {

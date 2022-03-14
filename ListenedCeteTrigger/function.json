@@ -1,7 +1,7 @@
 {
   "bindings": [
     {
-      "route": "v1/view/cete",
+      "route": "v1/listen/cete",
       "authLevel": "Anonymous",
       "type": "httpTrigger",
       "direction": "in",
@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/ViewedCeteTrigger/index.js"
+  "scriptFile": "../dist/ListenedCeteTrigger/index.js"
 }
