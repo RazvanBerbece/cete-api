@@ -64,6 +64,8 @@ The Endpoints are hosted and executed as Azure functions. Azure provides reliabl
 Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'
 ## 4.2 Data Storage
 Uses CosmosDB for metadata indexing. Actual audio data is stored in Azure Storage Containers within WAV-type Blobs.
+## 4.3 Logging
+Uses the UI-based option of App Logs for an AI Workspace.
 
 # 5 DevOps
 ## 5.1 CI
