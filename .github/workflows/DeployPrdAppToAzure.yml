@@ -2,7 +2,7 @@
 name: deploy-prd-app-to-azure
 
 on:
-  # Triggers the workflow on push events to main
+  # Triggers the workflow on push events to main (production)
   push:
     branches: [ main ]
 
