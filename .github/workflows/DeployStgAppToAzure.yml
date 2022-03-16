@@ -9,7 +9,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: cete-stg-api
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'     
-  NODE_VERSION: '14.x'               
+  NODE_VERSION: '16.x'               
  
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
