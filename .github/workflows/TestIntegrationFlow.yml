@@ -2,9 +2,12 @@
 name: test-integration-workflow
 
 on:
-  # Triggers the workflow on pull request events to all branches
+
+  # Triggers the workflow on pull request events to all branches excepting main
   pull_request:
-    branches: [ '**' ]
+    branches: 
+      - '**'
+      - '!main'
 
 env:
   NODE_VERSION: '16.x'    
