@@ -2,9 +2,12 @@
 name: test-integration-workflow
 
 on:
-  # Triggers the workflow on pull request events to main
+  # Triggers the workflow on pull request events to all branches
   pull_request:
     branches: [ '**' ]
+
+env:
+  NODE_VERSION: '16.x'    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch: 
@@ -18,10 +21,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Setup Node 16.x Environment
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: ${{ env.NODE_VERSION }}
 
       # Install npm packages from the package JSON file
       # Specifically install mocha due to a GitHub Actions bug not installing it
