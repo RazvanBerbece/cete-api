@@ -41,7 +41,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/get/profile/cetes', 
-                    { message: `ServerErrorGetFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
+                    { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
                 ),
                 headers: {
                     'Content-Type': 'application/json'
