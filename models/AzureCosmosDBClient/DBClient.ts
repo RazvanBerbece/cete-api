@@ -61,15 +61,17 @@ class DBClient {
      * @param ceteToDelete - Cete with existing ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    public async deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<void | Error> {
-        try {
-            const { resource: deleteOpResult } = await this.container.item(ceteToDelete.getCeteId()).delete();
-            // console.log(deleteOpResult);
-            return;
-        }
-        catch (err) {
-            return Error(`${err}`);
-        }
+    public async deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<string | Error> {
+        return new Promise((resolve, reject) => {
+            this.container.item(ceteToDelete.getCeteId()).delete()
+            .then((deleteOpResult) => {
+                // console.log(deleteOpResult)
+                resolve(deleteOpResult.item.id);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
     }
 
     /**
@@ -136,9 +138,11 @@ class DBClient {
      * @param ceteId - id of cete to be downloaded
      * @returns cete object as in CosmosDB
      */
-    public getCetefromCeteIndexing(ceteId: string): Promise<Cete> {
+    public getCetefromCeteIndexing(ceteId: string): Promise<Cete | Error> {
         return new Promise((resolve, reject) => {
+
             const querySelectSpec = DBClient.getQuerySpec(`SELECT * FROM c WHERE c.id='${ceteId}'`);
+
             this.container.items.query(querySelectSpec).fetchAll()
             .then((result) => {
 
@@ -155,7 +159,7 @@ class DBClient {
 
                 resolve(cete);
             })
-            .catch((err) => {
+            .catch((err: Error) => {
                 reject(err);
             });
         });

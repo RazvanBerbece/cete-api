@@ -40,8 +40,21 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
         // Connect to Azure DB using the DBClient internal API
         const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
-        await database_client.getCetefromCeteIndexing(ceteId)
-        .then(async (resource: Cete) => {
+        const resource = await database_client.getCetefromCeteIndexing(ceteId);
+        if (resource instanceof Error) {
+            context.res = {
+                status: STATUS_CODES.SERVER_LISTEN_AUDIO,
+                body: new Response(
+                    new Date().toLocaleString(), 
+                    'api/v1/listen/cete', 
+                    { message: `ServerListenCete : ${resource.message}. Cete did not update listens upstream.` }
+                ),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };  
+        }
+        else {
 
             // Continue building Cete object with data from upstream to match update target format
             ceteToBeListened.setTimestamp(resource.getTimestamp());
@@ -52,48 +65,35 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             ceteToBeListened.incrementListens();
 
             // Update object upstream
-            await database_client.updateCeteInCeteIndexing(ceteToBeListened)
-            .then(() => {
-                context.res = {
-                    status: STATUS_CODES.SUCCESS,
-                    body: new Response(
-                        new Date().toLocaleString(), 
-                        'api/v1/listen/cete', 
-                        { message: `Successfully registered listen for Cete ${ceteId}.` }
-                    ),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                };
-            })
-            .catch((err) => {
+            const listenedResource = await database_client.updateCeteInCeteIndexing(ceteToBeListened)
+            if (listenedResource instanceof Error) {
                 context.res = {
                     status: STATUS_CODES.SERVER_LISTEN_AUDIO,
                     body: new Response(
                         new Date().toLocaleString(), 
                         'api/v1/listen/cete', 
-                        { message: `ServerListenCete : ${err}. Cete did not update listens upstream.` }
+                        { message: `ServerListenCete : ${listenedResource.message}. Cete did not update listens upstream.` }
                     ),
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                };  
-            });
+                }; 
+            }
+            else {
+                context.res = {
+                    status: STATUS_CODES.SUCCESS,
+                    body: new Response(
+                        new Date().toLocaleString(), 
+                        'api/v1/listen/cete', 
+                        { message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` }
+                    ),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+            }
 
-        })
-        .catch((err) => {
-            context.res = {
-                status: STATUS_CODES.SERVER_LISTEN_AUDIO,
-                body: new Response(
-                    new Date().toLocaleString(), 
-                    'api/v1/listen/cete', 
-                    { message: `ServerListenCete : ${err}. Cete did not update listens upstream.` }
-                ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };  
-        });
+        }
 
     }
 
