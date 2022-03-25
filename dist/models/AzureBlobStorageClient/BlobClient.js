@@ -182,7 +182,7 @@ class StorageBlobClient {
                         resolve(ceteObj.getCeteDictWithData());
                     }))
                         .catch((err) => {
-                        reject(Error(`ServerErrorGetIdFromIndexing : ${err} ~> Failed to get audio data for cete with id ${ceteId}`));
+                        reject(Error(`ErrorGetCeteFromIndexing : ${err} ~> Failed to get metadata for cete with id ${ceteId}`));
                     });
                 }
                 catch (err) {

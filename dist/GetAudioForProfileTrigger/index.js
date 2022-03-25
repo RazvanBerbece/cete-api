@@ -41,7 +41,7 @@ const httpTrigger = function (context) {
             if (cetesDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `ServerErrorGetFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
