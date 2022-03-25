@@ -4,7 +4,12 @@ name: test-integration-workflow
 on:
   # Triggers the workflow on pull request events to main
   pull_request:
-    branches: [ '**' ]
+    branches: 
+      - '**'
+      - '!main'
+
+env:
+  NODE_VERSION: '14.x'    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch: 

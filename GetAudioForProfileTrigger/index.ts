@@ -5,7 +5,7 @@ import STATUS_CODES from "../models/StatusCode/statuses.js";
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
-    context.log('HTTP trigger function (v1/get/audio) is processing a GET request.');
+    context.log('HTTP trigger function (v1/get/profile/cetes) is processing a GET request.');
 
     // Get query params
     const userId = context.req.query.userId;
@@ -41,7 +41,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/get/profile/cetes', 
-                    { message: `ServerErrorGetFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
+                    { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
                 ),
                 headers: {
                     'Content-Type': 'application/json'

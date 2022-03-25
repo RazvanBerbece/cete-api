@@ -40,7 +40,7 @@ const httpTrigger = function (context) {
             if (ceteDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `ServerErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
                     headers: {
                         'Content-Type': 'application/json'
                     }

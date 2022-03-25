@@ -17,7 +17,7 @@ const BlobClient_1 = __importDefault(require("../models/AzureBlobStorageClient/B
 const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log('HTTP trigger function (v1/get/audio) is processing a GET request.');
+        context.log('HTTP trigger function (v1/get/profile/cetes) is processing a GET request.');
         // Get query params
         const userId = context.req.query.userId;
         const archived = context.req.query.archived;
@@ -41,7 +41,7 @@ const httpTrigger = function (context) {
             if (cetesDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `ServerErrorGetFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile/cetes', { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
                     headers: {
                         'Content-Type': 'application/json'
                     }

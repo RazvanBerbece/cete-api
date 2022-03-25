@@ -125,17 +125,17 @@ class StorageBlobClient {
                     // Set remaining ceteObj fields
                     ceteObj.setUserId(userId);
 
-                    // Get Cete timestamp
-                    await database_client.getCetefromCeteIndexing(ceteObj.getCeteId())
-                    .then((response: Cete) => {
-                        ceteObj.setTimestamp(response.getTimestamp());
-                        ceteObj.setListens(response.getListens());
-                        ceteObj.setIsArchived(response.getisArchived());
+                    // Get Cete timestamp & other upstream current values and populate the Cete object
+                    const resource = await database_client.getCetefromCeteIndexing(ceteObj.getCeteId());
+                    if (resource instanceof Error) {
+                        return Error(`${resource.message}`);
+                    }
+                    else {
+                        ceteObj.setTimestamp(resource.getTimestamp());
+                        ceteObj.setListens(resource.getListens());
+                        ceteObj.setIsArchived(resource.getisArchived());
                         cetes.push(ceteObj.getDictForProfile());
-                    })
-                    .catch(() => {
-                        return Error(`ServerErrorGetTimestampFromIndexing : Failed to get timestamp for cete with id ${ceteObj.getCeteId()}`)
-                    });
+                    }
 
                 }
 
@@ -189,7 +189,7 @@ class StorageBlobClient {
                     resolve(ceteObj.getCeteDictWithData());
                 })
                 .catch((err) => {
-                    reject(Error(`ServerErrorGetIdFromIndexing : ${err} ~> Failed to get audio data for cete with id ${ceteId}`));
+                    reject(Error(`ErrorGetCeteFromIndexing : ${err} ~> Failed to get metadata for cete with id ${ceteId}`));
                 });
             }
             catch (err) {
