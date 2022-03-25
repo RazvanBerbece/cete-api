@@ -67,14 +67,16 @@ class DBClient {
      */
     deleteCeteFromCeteIndexing(ceteToDelete) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { resource: deleteOpResult } = yield this.container.item(ceteToDelete.getCeteId()).delete();
-                // console.log(deleteOpResult);
-                return;
-            }
-            catch (err) {
-                return Error(`${err}`);
-            }
+            return new Promise((resolve, reject) => {
+                this.container.item(ceteToDelete.getCeteId()).delete()
+                    .then((deleteOpResult) => {
+                    // console.log(deleteOpResult)
+                    resolve(deleteOpResult.item.id);
+                })
+                    .catch((err) => {
+                    reject(err);
+                });
+            });
         });
     }
     /**
