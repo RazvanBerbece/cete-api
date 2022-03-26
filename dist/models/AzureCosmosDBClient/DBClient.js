@@ -34,8 +34,13 @@ class DBClient {
         // based on the ENVIRONMENT env variable
         // Declared here as .env is loaded a while after the 'func start' call
         const ENV = process.env['ENVIRONMENT'].toUpperCase();
-        // initialise CosmosClient
-        this.client = new cosmos_1.CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
+        // Initialise CosmosClient
+        // With Connection String (Option 1)
+        // this.client = new CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
+        // With Endpoint & Key (Option 2)
+        const endpoint = process.env[`COSMOS_${ENV}_DB_ENDPOINT`];
+        const key = process.env[`COSMOS_${ENV}_DB_KEY`];
+        this.client = new cosmos_1.CosmosClient({ endpoint, key });
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
     }
