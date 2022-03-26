@@ -1,7 +1,7 @@
 {
   "bindings": [
     {
-      "route": "v1/get/cete/id",
+      "route": "v1/get/cete",
       "authLevel": "Anonymous",
       "type": "httpTrigger",
       "direction": "in",
@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/GetAudioForIDTrigger/index.js"
+  "scriptFile": "../dist/GetCeteForIDTrigger/index.js"
 }

@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/GetAudioForUserFeed/index.js"
+  "scriptFile": "../dist/GetFeed/index.js"
 }

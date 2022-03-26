@@ -7,6 +7,7 @@
     "build": "tsc",
     "lint": "npx eslint . --ext .ts",
     "test": "npx mocha dist/test/test_models/**/*.js",
+    "prep": "tsc & npx eslint . --ext .ts & npx mocha dist/test/test_models/**/*.js",
     "start": "node --experimental-specifier-resolution=node dist/index.js"
   },
   "repository": {

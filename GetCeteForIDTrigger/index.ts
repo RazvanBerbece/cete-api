@@ -9,7 +9,7 @@ import STATUS_CODES from "../models/StatusCode/statuses.js";
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
-    context.log('HTTP trigger function (v1/get/cete/id) is processing a GET request.');
+    context.log('HTTP trigger function (v1/get/cete) is processing a GET request.');
 
     // Get query params
     const userId = context.req.query.userId;
@@ -20,7 +20,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             status: STATUS_CODES.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
             body: new Response(
                 new Date().toLocaleString(), 
-                'api/v1/get/cete/id', 
+                'api/v1/get/cete', 
                 { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }
             ),
             headers: {
@@ -37,7 +37,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 status: STATUS_CODES.SERVER_GET_AUDIO_DATA_FROM_BLOB,
                 body: new Response(
                     new Date().toLocaleString(), 
-                    'api/v1/get/cete/id', 
+                    'api/v1/get/cete', 
                     { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }
                 ),
                 headers: {
@@ -50,7 +50,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 status: STATUS_CODES.SUCCESS,
                 body: new Response(
                     new Date().toLocaleString(), 
-                    'api/v1/get/cete/id', 
+                    'api/v1/get/cete', 
                     { 
                         message: `Downloaded cete data for cete with id ${ceteId}`,
                         data: ceteDownloadResult

@@ -1,13 +1,13 @@
 {
   "bindings": [
     {
-      "route": "v1/upload/profile/cete",
+      "route": "v1/listen/cete",
       "authLevel": "Anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
       "methods": [
-        "post"
+        "put"
       ]
     },
     {
@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/UploadAudioTrigger/index.js"
+  "scriptFile": "../dist/ListenCeteTrigger/index.js"
 }

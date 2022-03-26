@@ -8,23 +8,30 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 # 1 Progress
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (~~v1/~~, ~~v1/upload/profile/cete~~, ~~v1/get/profile/cete~~, ~~v1/get/cete/id~~, v1/view/cete, v1/get/feed)
+[~] Azure functions (Cete logic, User System logic, Security logic, etc.)
 
 [~] CI/CD (testing, ~deployment~)
 
 [~] Audio Data Processing (~~metadata storage~~, ~~audio data storage~~, retrieval from storage unit/s)
 
 # 2 Endpoints
-All REST requests carry a payload of type application/json.
-- GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
-- POST ```https://cete-api.azurewebsites.net/api/v1/upload/profile/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
-- GET ```https://cete-api.azurewebsites.net/api/v1/get/profile/cetes``` -> Get a list of Cete objects under a userId with the given visibility. Limits the amount of objects retrieved through the 'limit' query parameter.
-- GET ```https://cete-api.azurewebsites.net/api/v1/get/cete/id``` -> Get a cete object with base64 audioData which can be translated on client-side to play audio.
-- GET ```https://cete-api.azurewebsites.net/api/v1/get/feed``` -> Get a list of Cetes to be displayed on a user feed.
-- etc.
+All REST responses for the URLs below carry a payload of type application/json.
+[x] GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
+
+[x] POST ```https://cete-api.azurewebsites.net/api/v1/upload/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
+
+[x] GET ```https://cete-api.azurewebsites.net/api/v1/get/profile``` -> Get a list of Cete objects under a userId with the given visibility. Limits the amount of objects retrieved through the 'limit' query parameter.
+
+[x] GET ```https://cete-api.azurewebsites.net/api/v1/get/cete``` -> Get a cete object with base64 audioData which can be translated on client-side to play audio.
+
+[~] GET ```https://cete-api.azurewebsites.net/api/v1/get/feed``` -> Get a list of Cetes to be displayed on a user feed.
+
+[x] PUT ```https://cete-api.azurewebsites.net/api/v1/listen/cete``` -> Increments the 'listened' count of a Cete (with the given ceteId) upstream by 1. 
+
+[ ] DELETE ```https://cete-api.azurewebsites.net/api/v1/delete/cete``` -> Deletes a Cete (with the given ceteId) from upstream.
 
 ## 2.1 Endpoints Request Templates
-1. POST ```api/v1/upload/profile/cete```
+1. POST ```api/v1/upload/cete```
 
         {
             "userId": <string>,
@@ -36,7 +43,7 @@ All REST requests carry a payload of type application/json.
         }
 
 ## 2.2 Endpoints Request Templates (Responses)
-1. POST ```api/v1/upload/profile/cete``` (RESPONSE)
+1. POST ```api/v1/upload/cete``` (RESPONSE)
 
         {
             "timestamp": <int_UNIX_TIME>, 
@@ -49,8 +56,8 @@ All REST requests carry a payload of type application/json.
 
 # 3 Tech Stack
 ## 3.1 Languages & Frameworks
-- NodeJS, TypeScript, JavaScript (writing the code)
-- Azure Function App (serverless & publishing)
+- NodeJS, TypeScript, JavaScript (Language)
+- Azure Function App (Serverless & publishing)
 - Azure Storage & CosmosDB (Data storage)
 - ESLint (linting)
 - Mocha (testing)
@@ -70,11 +77,12 @@ Uses the UI-based option of App Logs for an AI Workspace.
 # 5 DevOps
 ## 5.1 CI
 Uses GitHub Actions to run the npm scripts which install the npm packages, compile the TS code to JS code and execute the test scripts.
-See the CI workflow in ```.github/CI.yml```.
+See the CI workflow in ```.github/TestIntegrationFlow.yml```.
 
 ## 5.2 CD
-Uses GitHub Actions to run the npm scripts which will build the JS app out of the TypeScript source, lint and test the code. If the build is successful and the testing cases pass, the project folder will be deployed to Azure Function App automatically.
-See the CD workflow in ```.github/CD.yml```.
+Uses GitHub Actions to run the npm scripts which will build the JS app out of the TypeScript source, lint and test the code. If the build is successful and the testing cases pass, the project folder will be deployed to the staging or production environment in Azure Function App automatically.
+See the CD staging workflow in ```.github/DeployStgAppToAzure.yml```.
+See the CD production workflow in ```.github/DeployPrdAppToAzure.yml```.
 
 # 6 Usage
 In order to run the project locally, the dependencies have to be installed first (Node@x.y.z, the packages in package.json, package_lock.json, etc.).
