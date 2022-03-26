@@ -16,6 +16,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 
 # 2 Endpoints
 All REST responses for the URLs below carry a payload of type application/json.
+
 [x] GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
 
 [x] POST ```https://cete-api.azurewebsites.net/api/v1/upload/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
@@ -81,7 +82,9 @@ See the CI workflow in ```.github/TestIntegrationFlow.yml```.
 
 ## 5.2 CD
 Uses GitHub Actions to run the npm scripts which will build the JS app out of the TypeScript source, lint and test the code. If the build is successful and the testing cases pass, the project folder will be deployed to the staging or production environment in Azure Function App automatically.
+
 See the CD staging workflow in ```.github/DeployStgAppToAzure.yml```.
+
 See the CD production workflow in ```.github/DeployPrdAppToAzure.yml```.
 
 # 6 Usage
