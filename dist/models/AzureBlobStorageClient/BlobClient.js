@@ -67,6 +67,24 @@ class StorageBlobClient {
             return 1;
         });
     }
+    deleteCeteBlob(cete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Get filepath from cete object. Use filepath as Blob name for Blob to be deleted..
+            const blobName = cete.getFilePath();
+            if (blobName == "NaN") {
+                return Error("Cete does not have a filepath set.");
+            }
+            // Get the block blob client for the blobName and delete it
+            try {
+                const blobDeleteResponse = yield this.blobContainerClient.deleteBlob(blobName);
+                console.log(blobDeleteResponse);
+                return 1;
+            }
+            catch (err) {
+                return Error(err);
+            }
+        });
+    }
     /**
      * Deletes all records of the given Cete object from the upstreadm databases
      * @param cete - Cete object to be deleted from all storage
