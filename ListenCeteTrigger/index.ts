@@ -1,5 +1,5 @@
 /**
- * Endpoint called to increment the number of listens of a Cete (when a 'listen' counts as legal)
+ * Endpoint that triggers the incrementing of the number of listens of a Cete (when a 'listen' counts as legal - Client / Frontend responsibility)
  * Updates Cete object in process and then in CosmosDB Indexing
  */
 
@@ -8,6 +8,10 @@ import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses";
 import DBClient from "../models/AzureCosmosDBClient/DBClient";
 import Cete from "../models/Cete/Cete.js";
+
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 

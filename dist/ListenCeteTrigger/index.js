@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Endpoint called to increment the number of listens of a Cete (when a 'listen' counts as legal)
+ * Endpoint that triggers the incrementing of the number of listens of a Cete (when a 'listen' counts as legal - Client / Frontend responsibility)
  * Updates Cete object in process and then in CosmosDB Indexing
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -20,6 +20,9 @@ const Response_js_1 = __importDefault(require("../models/Response/Response.js"))
 const statuses_1 = __importDefault(require("../models/StatusCode/statuses"));
 const DBClient_1 = __importDefault(require("../models/AzureCosmosDBClient/DBClient"));
 const Cete_js_1 = __importDefault(require("../models/Cete/Cete.js"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/listen/cete) is processing a PUT request.');

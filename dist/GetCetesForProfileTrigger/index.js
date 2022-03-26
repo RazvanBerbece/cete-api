@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Endpoints that triggers the return of a list of profile-rendering-friendly Cete objects
+ * Includes metadata but no audio data in base64.
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,6 +19,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Response_js_1 = __importDefault(require("../models/Response/Response.js"));
 const BlobClient_1 = __importDefault(require("../models/AzureBlobStorageClient/BlobClient"));
 const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/get/profile) is processing a GET request.');

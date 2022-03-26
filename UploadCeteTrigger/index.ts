@@ -1,3 +1,8 @@
+/**
+ * Endpoint that triggers the storage of the JSON object attached in the body of the POST request
+ * in CosmosDB (Indexing - metadata) and Azure Storage (Blob - audio data)
+ */
+
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import Cete from "../models/Cete/Cete.js";
 import Response from "../models/Response/Response.js";

@@ -72,7 +72,7 @@ class DBClient {
         return new Promise((resolve, reject) => {
             this.container.item(ceteToDelete.getCeteId()).delete()
                 .then((deleteOpResult) => {
-                // console.log(deleteOpResult)
+                // TODO: Now delete blob which contains the audio data
                 resolve(deleteOpResult.item.id);
             })
                 .catch((err) => {

@@ -1,11 +1,16 @@
 /**
- * Endpoint for detailed view of a Cete
+ * Endpoint that triggers the return of a detailed populated model of a Cete with ceteId
+ * Includes metadata + audio data in base64
  */
 
 import { AzureFunction, Context } from "@azure/functions"
 import Response from "../models/Response/Response.js";
 import StorageBlobClient from "../models/AzureBlobStorageClient/BlobClient";
 import STATUS_CODES from "../models/StatusCode/statuses.js";
+
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 

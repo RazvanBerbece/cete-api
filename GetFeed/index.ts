@@ -10,6 +10,10 @@ import { AzureFunction, Context } from "@azure/functions";
 import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses";
 
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
+
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
     context.log('HTTP trigger function (v1/get/feed) is processing a GET request.');

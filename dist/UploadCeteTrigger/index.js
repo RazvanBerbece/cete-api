@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Endpoint that triggers the storage of the JSON object attached in the body of the POST request
+ * in CosmosDB (Indexing - metadata) and Azure Storage (Blob - audio data)
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
