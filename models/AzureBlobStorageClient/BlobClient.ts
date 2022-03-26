@@ -5,7 +5,7 @@
  * Handles connection, uploading & downloading data and returning useful outputs
  * 
  */
-import { BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
+import { BlobItem, BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import DBClient from "../AzureCosmosDBClient/DBClient";
 import Cete from "../Cete/Cete";
 import { CeteDictProfile, CeteDictWithData } from "../Cete/CeteTypes";
@@ -20,11 +20,16 @@ class StorageBlobClient {
 
         // Constant used to dynamically refer to either the staging or production environment on Azure, 
         // based on the ENVIRONMENT env variable
-        // Declared here as .env is loaded a while after the 'func start' call
-        const ENV = process.env['ENVIRONMENT'].toUpperCase();
+        // Declared here as .env is loaded a while after the "func start" call
+        const ENV = process.env["ENVIRONMENT"].toUpperCase();
 
-        // initialise BlobServiceClient
-        this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
+        // Initialise BlobServiceClient
+        // With Connection String (1)
+        // this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
+        // With Storage Account Name & Shared Key
+        const storageAccountName = "cetestgstorageacc"
+        const sharedKeyCredential = new StorageSharedKeyCredential(storageAccountName, process.env[`AZURE_${ENV}_STORAGE_ACC_KEY`]);
+        this.blobServiceClient = new BlobServiceClient(`https://cetestgstorageacc.blob.core.windows.net`, sharedKeyCredential)
         this.blobContainerClient = this.blobServiceClient.getContainerClient(blobContainerName);
 
     }
@@ -47,7 +52,7 @@ class StorageBlobClient {
 
         // Upload audio type data to the blob
         const data = cete.getData();
-        const blobOptions = { blobHTTPHeaders: { blobContentType: 'audio/wav' } };
+        const blobOptions = { blobHTTPHeaders: { blobContentType: "audio/wav" } };
         const uploadBlobResponse = await blockBlobClient.upload(data, data.length, blobOptions);
         console.log(
             "Blob was uploaded successfully. requestId:",
@@ -69,7 +74,7 @@ class StorageBlobClient {
     public async getCetesMetadataForUserIdFromWAVBlob(userId: string, archived: boolean, countLimit: number): Promise<BlobItem[] | Error> {
 
         const cetes = [];
-        const visibilityPath = archived == true ? 'archived' : 'public';
+        const visibilityPath = archived == true ? "archived" : "public";
 
         try {
             for await (const blob of this.blobContainerClient.listBlobsFlat({ prefix: `${userId}/${visibilityPath}` })) {
@@ -225,16 +230,16 @@ class StorageBlobClient {
         return new Promise((resolve, reject) => {
             let ceteId: string;
             const filepath = blobItem.name;
-            // Iterate backwards through string and create ceteId between '.wav' and the last '/' (/ceteId.wav)
+            // Iterate backwards through string and create ceteId between ".wav" and the last "/" (/ceteId.wav)
             // Skip the .wav right to left
-            let reversedCeteId= '';
+            let reversedCeteId= "";
             for (let i = filepath.length - 5; i >= 0; i--) {
-                if (filepath[i] != '/') {
+                if (filepath[i] != "/") {
                     reversedCeteId += filepath[i];
                 }
                 else {
                     // the iteratively built string has to be reversed to give the expected ceteId
-                    ceteId = reversedCeteId.split('').reverse().join('');
+                    ceteId = reversedCeteId.split("").reverse().join("");
                     resolve(ceteId);
                 }
             } 

@@ -30,8 +30,13 @@ class DBClient {
         // Declared here as .env is loaded a while after the 'func start' call
         const ENV = process.env['ENVIRONMENT'].toUpperCase();
 
-        // initialise CosmosClient
-        this.client = new CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
+        // Initialise CosmosClient
+        // With Connection String (Option 1)
+        // this.client = new CosmosClient(process.env[`COSMOS_${ENV}_DB_CONN_STRING`]);
+        // With Endpoint & Key (Option 2)
+        const endpoint = process.env[`COSMOS_${ENV}_DB_ENDPOINT`];
+        const key = process.env[`COSMOS_${ENV}_DB_KEY`];
+        this.client = new CosmosClient({ endpoint, key });
         this.database = this.client.database(databaseId);
         this.container = this.database.container(containerId);
     }
@@ -44,7 +49,7 @@ class DBClient {
      * @param updatedCete - Cete with existing ceteId to be updated. Uses the rest of the object fields to update
      * @returns void, err if error occurs while updating the Cete
      */
-    public async updateCeteInCeteIndexing(updatedCete: Cete): Promise<CeteDictIndexing | Error> {
+    public updateCeteInCeteIndexing(updatedCete: Cete): Promise<CeteDictIndexing | Error> {
         return new Promise((resolve, reject) => {
             this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
             .then((result) => {
@@ -61,7 +66,7 @@ class DBClient {
      * @param ceteToDelete - Cete with existing ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    public async deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<string | Error> {
+    public deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<string | Error> {
         return new Promise((resolve, reject) => {
             this.container.item(ceteToDelete.getCeteId()).delete()
             .then((deleteOpResult) => {
@@ -89,8 +94,11 @@ class DBClient {
             }
 
             // Update Cete in CosmosDB table with the generated filepath
-            this.updateCeteInCeteIndexing(cete)
-            .then(async () => {
+            const updateResource = await this.updateCeteInCeteIndexing(cete)
+            if (updateResource instanceof Error) {
+                return ["NaN", updateResource.message];
+            }
+            else {
                 // Upload Cete data to WAV Blob
                 const blobClient = new StorageBlobClient("cetes");
                 const uploadOpStatus = await blobClient.uploadCeteToWAVBlob(cete);
@@ -98,10 +106,7 @@ class DBClient {
                     return ["NaN", uploadOpStatus.message];
                 }
                 return [cete.getCeteId(), ""];
-            })
-            .catch((err) => {
-                return ["NaN", err];
-            });
+            }
         }
         catch (err) {
             return ["NaN", err];

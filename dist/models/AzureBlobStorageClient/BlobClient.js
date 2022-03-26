@@ -33,10 +33,15 @@ class StorageBlobClient {
     constructor(blobContainerName) {
         // Constant used to dynamically refer to either the staging or production environment on Azure, 
         // based on the ENVIRONMENT env variable
-        // Declared here as .env is loaded a while after the 'func start' call
-        const ENV = process.env['ENVIRONMENT'].toUpperCase();
-        // initialise BlobServiceClient
-        this.blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
+        // Declared here as .env is loaded a while after the "func start" call
+        const ENV = process.env["ENVIRONMENT"].toUpperCase();
+        // Initialise BlobServiceClient
+        // With Connection String (1)
+        // this.blobServiceClient = BlobServiceClient.fromConnectionString(process.env[`AZURE_${ENV}_STORAGE_ACC_CONN_STRING`]);
+        // With Storage Account Name & Shared Key
+        const storageAccountName = "cetestgstorageacc";
+        const sharedKeyCredential = new storage_blob_1.StorageSharedKeyCredential(storageAccountName, process.env[`AZURE_${ENV}_STORAGE_ACC_KEY`]);
+        this.blobServiceClient = new storage_blob_1.BlobServiceClient(`https://cetestgstorageacc.blob.core.windows.net`, sharedKeyCredential);
         this.blobContainerClient = this.blobServiceClient.getContainerClient(blobContainerName);
     }
     /**
@@ -55,7 +60,7 @@ class StorageBlobClient {
             const blockBlobClient = this.blobContainerClient.getBlockBlobClient(blobName);
             // Upload audio type data to the blob
             const data = cete.getData();
-            const blobOptions = { blobHTTPHeaders: { blobContentType: 'audio/wav' } };
+            const blobOptions = { blobHTTPHeaders: { blobContentType: "audio/wav" } };
             const uploadBlobResponse = yield blockBlobClient.upload(data, data.length, blobOptions);
             console.log("Blob was uploaded successfully. requestId:", uploadBlobResponse.requestId);
             // TODO: Maybe return processed thumbnail ? (if done on server-side)
@@ -73,7 +78,7 @@ class StorageBlobClient {
         var e_1, _a;
         return __awaiter(this, void 0, void 0, function* () {
             const cetes = [];
-            const visibilityPath = archived == true ? 'archived' : 'public';
+            const visibilityPath = archived == true ? "archived" : "public";
             try {
                 try {
                     for (var _b = __asyncValues(this.blobContainerClient.listBlobsFlat({ prefix: `${userId}/${visibilityPath}` })), _c; _c = yield _b.next(), !_c.done;) {
@@ -218,16 +223,16 @@ class StorageBlobClient {
             return new Promise((resolve, reject) => {
                 let ceteId;
                 const filepath = blobItem.name;
-                // Iterate backwards through string and create ceteId between '.wav' and the last '/' (/ceteId.wav)
+                // Iterate backwards through string and create ceteId between ".wav" and the last "/" (/ceteId.wav)
                 // Skip the .wav right to left
-                let reversedCeteId = '';
+                let reversedCeteId = "";
                 for (let i = filepath.length - 5; i >= 0; i--) {
-                    if (filepath[i] != '/') {
+                    if (filepath[i] != "/") {
                         reversedCeteId += filepath[i];
                     }
                     else {
                         // the iteratively built string has to be reversed to give the expected ceteId
-                        ceteId = reversedCeteId.split('').reverse().join('');
+                        ceteId = reversedCeteId.split("").reverse().join("");
                         resolve(ceteId);
                     }
                 }
