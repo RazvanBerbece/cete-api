@@ -32,7 +32,10 @@ const httpTrigger = function (context) {
         if (typeof userId === 'undefined') {
             context.res = {
                 status: statuses_1.default.CLIENT_INVALID_REQUEST_NO_UID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/feed', { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/feed', {
+                    message: `Failed to GET feed for user with userId ${userId}`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }

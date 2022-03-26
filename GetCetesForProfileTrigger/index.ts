@@ -27,7 +27,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/profile', 
-                { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }
+                { 
+                    message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -46,11 +49,14 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
 
         if (cetesDownloadResult instanceof Error) {
             context.res = {
-                status: STATUS_CODES.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
+                status: STATUS_CODES.SERVER_GET_CETES_FOR_PROFILE,
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/get/profile', 
-                    { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
+                    { 
+                        message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                        error: cetesDownloadResult.message
+                    }
                 ),
                 headers: {
                     'Content-Type': 'application/json'

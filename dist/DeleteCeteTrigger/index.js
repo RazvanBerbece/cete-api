@@ -22,23 +22,38 @@ const statuses_1 = __importDefault(require("../models/StatusCode/statuses"));
 // Load environment variables
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const httpTrigger = function (context, req) {
+const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/delete/cete) is processing a DELETE request.');
         // Get query params
-        const userId = context.req.query.userId;
         const ceteId = context.req.query.ceteId;
         // Connect to Azure DB using the DBClient internal API
         const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
-        context.res = {
-            status: statuses_1.default.SUCCESS,
-            body: new Response_1.default(new Date().toLocaleString(), 'api/v1/delete/cete', {
-                message: `Successfully deleted Cete with id ${ceteId}.`,
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
+        // Delete all references to the Cete with ceteId from all storage units (CosmosDB, Azure Storage)
+        try {
+            yield database_client.deleteCeteFromCeteIndexing(ceteId);
+            context.res = {
+                status: statuses_1.default.SUCCESS,
+                body: new Response_1.default(new Date().toLocaleString(), 'api/v1/delete/cete', {
+                    message: `Succuessfully deleted Cete with ceteId ${ceteId}.`,
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+        }
+        catch (err) {
+            context.res = {
+                status: statuses_1.default.SERVER_DELETE_CETE,
+                body: new Response_1.default(new Date().toLocaleString(), 'api/v1/delete/cete', {
+                    message: `Failed to delete Cete with ceteId ${ceteId}.`,
+                    error: err.body.message
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+        }
     });
 };
 exports.default = httpTrigger;

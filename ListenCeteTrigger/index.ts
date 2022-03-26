@@ -27,7 +27,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/listen/cete', 
-                { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` }
+                { 
+                    message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -51,7 +54,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/listen/cete', 
-                    { message: `ServerListenCete : ${resource.message}. Cete did not update listens upstream.` }
+                    { 
+                        message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                        error: resource.message
+                    }
                 ),
                 headers: {
                     'Content-Type': 'application/json'
@@ -76,7 +82,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     body: new Response(
                         new Date().toLocaleString(), 
                         'api/v1/listen/cete', 
-                        { message: `ServerListenCete : ${listenedResource.message}. Cete did not update listens upstream.` }
+                        { 
+                            message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                            error: listenedResource.message
+                        }
                     ),
                     headers: {
                         'Content-Type': 'application/json'
@@ -89,7 +98,9 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     body: new Response(
                         new Date().toLocaleString(), 
                         'api/v1/listen/cete', 
-                        { message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` }
+                        { 
+                            message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` 
+                        }
                     ),
                     headers: {
                         'Content-Type': 'application/json'

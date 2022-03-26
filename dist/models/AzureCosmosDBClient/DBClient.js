@@ -65,19 +65,35 @@ class DBClient {
     }
     /**
      * Deletes an existing ceteObj from the indexing table
-     * @param ceteToDelete - Cete with existing ceteId to be deleted
+     * @param ceteId - Cete with ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    deleteCeteFromCeteIndexing(ceteToDelete) {
-        return new Promise((resolve, reject) => {
-            this.container.item(ceteToDelete.getCeteId()).delete()
-                .then((deleteOpResult) => {
-                // TODO: Now delete blob which contains the audio data
-                resolve(deleteOpResult.item.id);
-            })
-                .catch((err) => {
-                reject(err);
-            });
+    deleteCeteFromCeteIndexing(ceteId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("GOT HERE 1");
+                const { resource: result } = yield this.container.item(ceteId).delete();
+                console.log("GOT HERE 2");
+                const ceteFromUpstreamResult = yield this.getCetefromCeteIndexing(ceteId);
+                if (ceteFromUpstreamResult instanceof Error) {
+                    console.log("GOT HERE 3");
+                    return Promise.reject(ceteFromUpstreamResult);
+                }
+                else {
+                    // Delete blob which contains the audio data
+                    console.log("GOT HERE 4");
+                    const blobClient = new BlobClient_1.default("cetes");
+                    const deleteOpStatus = yield blobClient.deleteCeteBlob(ceteFromUpstreamResult);
+                    if (deleteOpStatus != 1) {
+                        return Promise.reject(deleteOpStatus);
+                    }
+                    console.log("GOT HERE 5");
+                    return Promise.resolve(ceteId);
+                }
+            }
+            catch (err) {
+                return Promise.reject(err);
+            }
         });
     }
     /**

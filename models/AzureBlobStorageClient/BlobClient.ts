@@ -41,10 +41,10 @@ class StorageBlobClient {
      */
     public async uploadCeteToWAVBlob(cete: Cete): Promise<1 | Error> {
 
-        // Create blob name
+        // Get filepath from cete object. Use filepath as a Blob name.
         const blobName = cete.getFilePath();
         if (blobName == "NaN") {
-            return Error("Cete does not have a filepath.");
+            return Error("Cete does not have a filepath set.");
         }
 
         // Get a block blob client
@@ -61,6 +61,26 @@ class StorageBlobClient {
 
         // TODO: Maybe return processed thumbnail ? (if done on server-side)
         return 1;
+
+    }
+
+    public async deleteCeteBlob(cete: Cete): Promise<1 | Error> {
+
+        // Get filepath from cete object. Use filepath as Blob name for Blob to be deleted..
+        const blobName = cete.getFilePath();
+        if (blobName == "NaN") {
+            return Error("Cete does not have a filepath set.");
+        }
+
+        // Get the block blob client for the blobName and delete it
+        try {
+            const blobDeleteResponse = await this.blobContainerClient.deleteBlob(blobName);
+            console.log(blobDeleteResponse);
+            return 1;
+        }
+        catch (err) {
+            return Error(err);
+        }
 
     }
 

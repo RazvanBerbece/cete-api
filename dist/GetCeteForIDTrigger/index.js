@@ -31,7 +31,10 @@ const httpTrigger = function (context) {
         if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
+                    message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -44,7 +47,10 @@ const httpTrigger = function (context) {
             if (ceteDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
+                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                        error: ceteDownloadResult.message
+                    }),
                     headers: {
                         'Content-Type': 'application/json'
                     }

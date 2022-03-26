@@ -27,7 +27,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/feed', 
-                { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }
+                { 
+                    message: `Failed to GET feed for user with userId ${userId}`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'

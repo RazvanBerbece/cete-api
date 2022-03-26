@@ -51,10 +51,10 @@ class StorageBlobClient {
      */
     uploadCeteToWAVBlob(cete) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Create blob name
+            // Get filepath from cete object. Use filepath as a Blob name.
             const blobName = cete.getFilePath();
             if (blobName == "NaN") {
-                return Error("Cete does not have a filepath.");
+                return Error("Cete does not have a filepath set.");
             }
             // Get a block blob client
             const blockBlobClient = this.blobContainerClient.getBlockBlobClient(blobName);
@@ -65,6 +65,24 @@ class StorageBlobClient {
             console.log("Blob was uploaded successfully. requestId:", uploadBlobResponse.requestId);
             // TODO: Maybe return processed thumbnail ? (if done on server-side)
             return 1;
+        });
+    }
+    deleteCeteBlob(cete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Get filepath from cete object. Use filepath as Blob name for Blob to be deleted..
+            const blobName = cete.getFilePath();
+            if (blobName == "NaN") {
+                return Error("Cete does not have a filepath set.");
+            }
+            // Get the block blob client for the blobName and delete it
+            try {
+                const blobDeleteResponse = yield this.blobContainerClient.deleteBlob(blobName);
+                console.log(blobDeleteResponse);
+                return 1;
+            }
+            catch (err) {
+                return Error(err);
+            }
         });
     }
     /**

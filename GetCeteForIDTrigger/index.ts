@@ -26,7 +26,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/cete', 
-                { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }
+                { 
+                    message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter`
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -43,7 +46,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/get/cete', 
-                    { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }
+                    { 
+                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                        error: ceteDownloadResult.message
+                    }
                 ),
                 headers: {
                     'Content-Type': 'application/json'

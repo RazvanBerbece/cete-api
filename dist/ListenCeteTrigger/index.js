@@ -32,7 +32,10 @@ const httpTrigger = function (context) {
         if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
             context.res = {
                 status: statuses_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                    message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -49,7 +52,10 @@ const httpTrigger = function (context) {
             if (resource instanceof Error) {
                 context.res = {
                     status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `ServerListenCete : ${resource.message}. Cete did not update listens upstream.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                        message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                        error: resource.message
+                    }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -67,7 +73,10 @@ const httpTrigger = function (context) {
                 if (listenedResource instanceof Error) {
                     context.res = {
                         status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `ServerListenCete : ${listenedResource.message}. Cete did not update listens upstream.` }),
+                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                            message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                            error: listenedResource.message
+                        }),
                         headers: {
                             'Content-Type': 'application/json'
                         }
@@ -76,7 +85,9 @@ const httpTrigger = function (context) {
                 else {
                     context.res = {
                         status: statuses_1.default.SUCCESS,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` }),
+                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                            message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}`
+                        }),
                         headers: {
                             'Content-Type': 'application/json'
                         }

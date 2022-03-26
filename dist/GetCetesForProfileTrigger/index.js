@@ -32,7 +32,10 @@ const httpTrigger = function (context) {
         if (typeof userId === 'undefined' || typeof archived === 'undefined') {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_UID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile', { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile', {
+                    message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -47,8 +50,11 @@ const httpTrigger = function (context) {
             const cetesDownloadResult = yield blobClient.downloadCetesForProfile(userId, (archived === 'true'), limitCount); // convert 'archive' var to a boolean
             if (cetesDownloadResult instanceof Error) {
                 context.res = {
-                    status: statuses_js_1.default.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile', { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }),
+                    status: statuses_js_1.default.SERVER_GET_CETES_FOR_PROFILE,
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile', {
+                        message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                        error: cetesDownloadResult.message
+                    }),
                     headers: {
                         'Content-Type': 'application/json'
                     }

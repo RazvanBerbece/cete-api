@@ -63,22 +63,37 @@ class DBClient {
 
     /**
      * Deletes an existing ceteObj from the indexing table
-     * @param ceteToDelete - Cete with existing ceteId to be deleted
+     * @param ceteId - Cete with ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    public deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<string | Error> {
-        return new Promise((resolve, reject) => {
-            this.container.item(ceteToDelete.getCeteId()).delete()
-            .then((deleteOpResult) => {
-
-                // TODO: Now delete blob which contains the audio data
-
-                resolve(deleteOpResult.item.id);
-            })
-            .catch((err) => {
-                reject(err);
-            });
-        });
+    public async deleteCeteFromCeteIndexing(ceteId: string): Promise<string | Error> {
+        try {
+            console.log("GOT HERE 1");
+            
+            const { resource: result } = await this.container.item(ceteId).delete();
+    
+            console.log("GOT HERE 2");
+    
+            const ceteFromUpstreamResult = await this.getCetefromCeteIndexing(ceteId);
+            if (ceteFromUpstreamResult instanceof Error) {
+                console.log("GOT HERE 3");
+                return Promise.reject<Error>(ceteFromUpstreamResult);
+            }
+            else {
+                // Delete blob which contains the audio data
+                console.log("GOT HERE 4");
+                const blobClient = new StorageBlobClient("cetes");
+                const deleteOpStatus = await blobClient.deleteCeteBlob(ceteFromUpstreamResult);
+                if (deleteOpStatus != 1) {
+                    return Promise.reject<Error>(deleteOpStatus);
+                }
+                console.log("GOT HERE 5");
+                return Promise.resolve<string>(ceteId);
+            }
+        }
+        catch (err) {
+            return Promise.reject<Error>(err);
+        } 
     }
 
     /**
