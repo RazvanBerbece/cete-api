@@ -1,13 +1,13 @@
 {
   "bindings": [
     {
-      "route": "v1/listen/cete",
+      "route": "v1/get/profile",
       "authLevel": "Anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
       "methods": [
-        "put"
+        "get"
       ]
     },
     {
@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/ListenedCeteTrigger/index.js"
+  "scriptFile": "../dist/GetCetesForProfileTrigger/index.js"
 }
