@@ -20,14 +20,14 @@ const BlobClient_1 = __importDefault(require("../models/AzureBlobStorageClient/B
 const statuses_js_1 = __importDefault(require("../models/StatusCode/statuses.js"));
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log('HTTP trigger function (v1/get/cete/id) is processing a GET request.');
+        context.log('HTTP trigger function (v1/get/cete) is processing a GET request.');
         // Get query params
         const userId = context.req.query.userId;
         const ceteId = context.req.query.ceteId;
         if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter` }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -40,7 +40,7 @@ const httpTrigger = function (context) {
             if (ceteDownloadResult instanceof Error) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', { message: `ErrorGetDataFromBlob : ${ceteDownloadResult.message}. GET Request has downloaded no data.` }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -49,7 +49,7 @@ const httpTrigger = function (context) {
             else {
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete/id', {
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
                         message: `Downloaded cete data for cete with id ${ceteId}`,
                         data: ceteDownloadResult
                     }),

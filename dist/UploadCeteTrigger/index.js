@@ -27,12 +27,12 @@ dotenv_1.default.config();
  */
 const httpTrigger = function (context, req) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log('HTTP trigger function (v1/upload/profile/cete) is processing a POST request.');
+        context.log('HTTP trigger function (v1/upload/cete) is processing a POST request.');
         // TODO: Authenticate POST request
         if (!req.body) { // CHECK -- POST body exists
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_BODY,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
                     error: `InvalidRequestNoBody : POST Request has no body.`
                 }),
                 headers: {
@@ -44,7 +44,7 @@ const httpTrigger = function (context, req) {
         if (!resultData.data) { // CHECK -- POST body has data field
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_DATA,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
                     error: `InvalidRequestNoData : POST Request body has no data.`
                 }),
                 headers: {
@@ -67,7 +67,7 @@ const httpTrigger = function (context, req) {
                 // error occured, id is NaN
                 context.res = {
                     status: statuses_js_1.default.SERVER_DB_ERROR,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
                         error: `ServerDBError: Server could not upload Cete metadata to database. ${indexingOutput[1]}.`,
                     }),
                     headers: {
@@ -78,7 +78,7 @@ const httpTrigger = function (context, req) {
             default:
                 context.res = {
                     status: 200,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/profile/cete', {
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
                         message: `Uploaded Cete metadata to database successfully.`,
                         ceteId: ceteObj.getCeteId()
                     }),
