@@ -48,15 +48,13 @@ class DBClient {
      * @returns void, err if error occurs while updating the Cete
      */
     updateCeteInCeteIndexing(updatedCete) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
-                    .then((result) => {
-                    resolve(result.resource);
-                })
-                    .catch((err) => {
-                    reject(err);
-                });
+        return new Promise((resolve, reject) => {
+            this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
+                .then((result) => {
+                resolve(result.resource);
+            })
+                .catch((err) => {
+                reject(err);
             });
         });
     }
@@ -66,16 +64,14 @@ class DBClient {
      * @returns void, err if error occurs while deleting the Cete
      */
     deleteCeteFromCeteIndexing(ceteToDelete) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                this.container.item(ceteToDelete.getCeteId()).delete()
-                    .then((deleteOpResult) => {
-                    // console.log(deleteOpResult)
-                    resolve(deleteOpResult.item.id);
-                })
-                    .catch((err) => {
-                    reject(err);
-                });
+        return new Promise((resolve, reject) => {
+            this.container.item(ceteToDelete.getCeteId()).delete()
+                .then((deleteOpResult) => {
+                // console.log(deleteOpResult)
+                resolve(deleteOpResult.item.id);
+            })
+                .catch((err) => {
+                reject(err);
             });
         });
     }
@@ -93,8 +89,11 @@ class DBClient {
                     return ["NaN", setFilePathStatus.message];
                 }
                 // Update Cete in CosmosDB table with the generated filepath
-                this.updateCeteInCeteIndexing(cete)
-                    .then(() => __awaiter(this, void 0, void 0, function* () {
+                const updateResource = yield this.updateCeteInCeteIndexing(cete);
+                if (updateResource instanceof Error) {
+                    return ["NaN", updateResource.message];
+                }
+                else {
                     // Upload Cete data to WAV Blob
                     const blobClient = new BlobClient_1.default("cetes");
                     const uploadOpStatus = yield blobClient.uploadCeteToWAVBlob(cete);
@@ -102,10 +101,7 @@ class DBClient {
                         return ["NaN", uploadOpStatus.message];
                     }
                     return [cete.getCeteId(), ""];
-                }))
-                    .catch((err) => {
-                    return ["NaN", err];
-                });
+                }
             }
             catch (err) {
                 return ["NaN", err];
