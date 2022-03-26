@@ -37,6 +37,7 @@ jobs:
           echo COSMOS_STG_DB_CONN_STRING=${{ secrets.COSMOS_STG_DB_CONN_STRING }} >> .env
           echo ENVIRONMENT=stg >> .env 
           echo AZURE_STG_STORAGE_ACC_CONN_STRING=${{ secrets.AZURE_STG_STORAGE_ACC_CONN_STRING }} >> .env
+          echo AZURE_STG_STORAGE_ACC_KEY=${{ secrets.AZURE_STG_STORAGE_ACC_KEY }} >> .env
           cat .env
 
       # Install npm packages from the package JSON file
