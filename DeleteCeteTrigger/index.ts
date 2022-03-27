@@ -31,7 +31,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 new Date().toLocaleString(), 
                 'api/v1/delete/cete', 
                 { 
-                    message: `Succuessfully deleted Cete with ceteId ${ceteId}.`,
+                    message: `Successfully deleted Cete with ceteId ${ceteId}.`,
                 }
             ),
             headers: {

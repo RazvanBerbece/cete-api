@@ -4,6 +4,7 @@
  */
 
 import { AzureFunction, Context } from "@azure/functions";
+import { CeteDictIndexing } from "../models/Cete/CeteTypes.js";
 import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses";
 import DBClient from "../models/AzureCosmosDBClient/DBClient";
@@ -11,7 +12,6 @@ import Cete from "../models/Cete/Cete.js";
 
 // Load environment variables
 import dotenv from "dotenv";
-import { CeteDictIndexing } from "../models/Cete/CeteTypes.js";
 dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {

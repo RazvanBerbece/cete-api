@@ -91,6 +91,29 @@ class StorageBlobClient {
         });
     }
     /**
+     * Deletes all records of the given Cete object from the upstreadm databases
+     * @param cete - Cete object to be deleted from all storage
+     * @returns 1 if successful, error if not
+     */
+    deleteCeteBlob(cete) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Get filepath from cete object. Use filepath as Blob name for Blob to be deleted..
+            const blobName = cete.getFilePath();
+            if (blobName == "NaN") {
+                throw Error("Cete does not have a filepath set");
+            }
+            // Get the block blob client for the blobName and delete it
+            try {
+                const blobDeleteResponse = yield this.blobContainerClient.deleteBlob(blobName);
+                console.log(blobDeleteResponse);
+                return 1;
+            }
+            catch (err) {
+                throw Error(err);
+            }
+        });
+    }
+    /**
      * Gets a list of metadata items from the Azure blobs under userId
      * @param userId - the downloaded cetes will haven been posted by the user with userId
      * @param archived - whether to get publicly visible cetes or archived ones
@@ -179,11 +202,10 @@ class StorageBlobClient {
     }
     /**
      * Downloads cete audioData from the WAV Blob using the filepath stored in the CosmosDB Indexing
-     * @param userId - id of user downloading the cete data
      * @param ceteId - id of cete data to be downloaded
      * @returns CeteDictWithData if successful, Error if failed
      */
-    downloadCeteFromWAVBlob(userId, ceteId) {
+    downloadCeteFromWAVBlob(ceteId) {
         return __awaiter(this, void 0, void 0, function* () {
             // Connect to Azure DB using the DBClient internal API
             const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
@@ -201,7 +223,7 @@ class StorageBlobClient {
                     ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
                     // Set ceteObj fields
                     ceteObj.setIsArchived(response.getisArchived());
-                    ceteObj.setUserId(userId);
+                    ceteObj.setUserId(response.getUserId());
                     ceteObj.setCeteId(ceteId);
                     ceteObj.setTimestamp(response.getTimestamp());
                     ceteObj.setListens(response.getListens());

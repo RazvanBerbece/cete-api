@@ -72,7 +72,9 @@ Implemented as IaC (Infrastructure as Code) using Terraform, the code can be eas
 ## 4.1 Server Hosting
 The Endpoints are hosted and executed as Azure functions. Azure provides reliable, scalable, serverless features for NodeJS projects. 
 Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'.
-Sample Azure Func command : `func new --name AzureFuncName --template "HTTP trigger" --authlevel "anonymous"`
+
+### Sample Azure Func creation command
+`func new --name AzureFuncName --template "HTTP trigger" --authlevel "anonymous"`
 ## 4.2 Data Storage
 Uses CosmosDB for metadata indexing. Actual audio data is stored in Azure Storage Containers within WAV-type Blobs.
 ## 4.3 Logging

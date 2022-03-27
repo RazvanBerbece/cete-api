@@ -56,7 +56,6 @@ class DBClient {
                 resolve(result.resource);
             })
             .catch((err) => {
-                console.log("GOT HERE M2");
                 reject(Error(`${err}. Could not update Cete in indexing`));
             });
         });

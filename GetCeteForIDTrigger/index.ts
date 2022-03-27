@@ -17,10 +17,9 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
     context.log('HTTP trigger function (v1/get/cete) is processing a GET request.');
 
     // Get query params
-    const userId = context.req.query.userId;
     const ceteId = context.req.query.ceteId;
     
-    if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
+    if (typeof ceteId === 'undefined') {
         context.res = {
             status: STATUS_CODES.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
             body: new Response(
@@ -28,7 +27,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 'api/v1/get/cete', 
                 { 
                     message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
-                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter`
+                    error: `InvalidRequestNoCeteID : GET Request has no Cete ID`
                 }
             ),
             headers: {
@@ -40,7 +39,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
         // Instantiate Blob Storage client and get data
         const blobClient = new StorageBlobClient('cetes');
         try {
-            const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(userId, ceteId);
+            const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(ceteId);
             context.res = {
                 status: STATUS_CODES.SUCCESS,
                 body: new Response(
