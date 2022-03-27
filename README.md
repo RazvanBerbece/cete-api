@@ -95,3 +95,4 @@ See the CD production workflow in ```.github/DeployPrdAppToAzure.yml```.
 # 6 Usage
 In order to run the project locally, the dependencies have to be installed first (Node@x.y.z, the packages in package.json, package_lock.json, etc.).
 The ```dist/``` folder holds the transpiled TypeScript code which is actually run with the ```npm start``` command.
+Can also run `npm run prep` to bundle-run linting, transpiling and testing the npm package.
