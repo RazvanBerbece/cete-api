@@ -8,7 +8,9 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 # 1 Progress
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (Cete logic, User System logic, Security logic, etc.)
+[~] Azure functions (Cete, User System, etc.)
+
+[ ] Functions Security (Request Authorization, Auth)
 
 [~] CI/CD (testing, ~deployment~)
 
@@ -29,7 +31,7 @@ All REST responses for the URLs below carry a payload of type application/json.
 
 [x] PUT ```https://cete-api.azurewebsites.net/api/v1/listen/cete``` -> Increments the 'listened' count of a Cete (with the given ceteId) upstream by 1. 
 
-[ ] DELETE ```https://cete-api.azurewebsites.net/api/v1/delete/cete``` -> Deletes a Cete (with the given ceteId) from upstream.
+[x] DELETE ```https://cete-api.azurewebsites.net/api/v1/delete/cete``` -> Deletes a Cete (with the given ceteId) from upstream.
 
 ## 2.1 Endpoints Request Templates
 1. POST ```api/v1/upload/cete```

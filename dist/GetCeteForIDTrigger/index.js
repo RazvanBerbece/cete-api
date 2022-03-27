@@ -48,7 +48,7 @@ const httpTrigger = function (context) {
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
-                        message: `Downloaded cete data for cete with id ${ceteId}`,
+                        message: `Downloaded Cete object for ceteId ${ceteId}`,
                         data: ceteDownloadResult
                     }),
                     headers: {

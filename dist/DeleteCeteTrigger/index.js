@@ -47,7 +47,7 @@ const httpTrigger = function (context) {
                 status: statuses_1.default.SERVER_DELETE_CETE,
                 body: new Response_1.default(new Date().toLocaleString(), 'api/v1/delete/cete', {
                     message: `Failed to delete Cete with ceteId ${ceteId}.`,
-                    error: err.body.message
+                    error: err.message !== undefined ? err.message : err.body.message // use either processed error message or message received from Azure, whichever is available
                 }),
                 headers: {
                     'Content-Type': 'application/json'

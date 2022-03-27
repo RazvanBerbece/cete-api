@@ -47,7 +47,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 'api/v1/delete/cete', 
                 { 
                     message: `Failed to delete Cete with ceteId ${ceteId}.`,
-                    error: err.body.message
+                    error: err.message !== undefined ? err.message : err.body.message // use either processed error message or message received from Azure, whichever is available
                 }
             ),
             headers: {

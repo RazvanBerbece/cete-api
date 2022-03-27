@@ -64,7 +64,7 @@ const httpTrigger = function (context) {
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/profile', {
-                        message: `Downloaded ${cetesDownloadResult.length} cetes for user ${userId}`,
+                        message: `Downloaded ${cetesDownloadResult.length} Cetes for user ${userId}`,
                         data: cetesDownloadResult
                     }),
                     headers: {

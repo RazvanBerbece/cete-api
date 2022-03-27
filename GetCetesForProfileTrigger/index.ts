@@ -70,7 +70,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     new Date().toLocaleString(), 
                     'api/v1/get/profile', 
                     { 
-                        message: `Downloaded ${cetesDownloadResult.length} cetes for user ${userId}`,
+                        message: `Downloaded ${cetesDownloadResult.length} Cetes for user ${userId}`,
                         data: cetesDownloadResult
                     }
                 ),

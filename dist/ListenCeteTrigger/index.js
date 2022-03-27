@@ -48,20 +48,8 @@ const httpTrigger = function (context) {
             ceteToBeListened.setUserId(userId);
             // Connect to Azure DB using the DBClient internal API
             const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
-            const resource = yield database_client.getCetefromCeteIndexing(ceteId);
-            if (resource instanceof Error) {
-                context.res = {
-                    status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
-                        message: `Failed to register listen for cete with ceteId ${ceteId}`,
-                        error: resource.message
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                };
-            }
-            else {
+            try {
+                const resource = yield database_client.getCetefromCeteIndexing(ceteId);
                 // Continue building Cete object with data from upstream to match update target format
                 ceteToBeListened.setTimestamp(resource.getTimestamp());
                 ceteToBeListened.setFilePath(resource.getFilePath());
@@ -69,20 +57,9 @@ const httpTrigger = function (context) {
                 ceteToBeListened.setListens(resource.getListens());
                 ceteToBeListened.incrementListens();
                 // Update object upstream
-                const listenedResource = yield database_client.updateCeteInCeteIndexing(ceteToBeListened);
-                if (listenedResource instanceof Error) {
-                    context.res = {
-                        status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
-                            message: `Failed to register listen for cete with ceteId ${ceteId}`,
-                            error: listenedResource.message
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    };
-                }
-                else {
+                try {
+                    const listenedResource = yield database_client.updateCeteInCeteIndexing(ceteToBeListened);
+                    console.log("GOT HERE M3");
                     context.res = {
                         status: statuses_1.default.SUCCESS,
                         body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
@@ -93,6 +70,31 @@ const httpTrigger = function (context) {
                         }
                     };
                 }
+                catch (err) {
+                    console.log("GOT HERE M1");
+                    context.res = {
+                        status: statuses_1.default.SERVER_LISTEN_AUDIO,
+                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                            message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                            error: err.message
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                }
+            }
+            catch (err) {
+                context.res = {
+                    status: statuses_1.default.SERVER_LISTEN_AUDIO,
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                        message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                        error: err.message
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
             }
         }
     });

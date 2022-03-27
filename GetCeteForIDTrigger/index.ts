@@ -47,7 +47,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     new Date().toLocaleString(), 
                     'api/v1/get/cete', 
                     { 
-                        message: `Downloaded cete data for cete with id ${ceteId}`,
+                        message: `Downloaded Cete object for ceteId ${ceteId}`,
                         data: ceteDownloadResult
                     }
                 ),
