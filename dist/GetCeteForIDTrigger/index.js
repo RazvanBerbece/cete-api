@@ -26,14 +26,13 @@ const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/get/cete) is processing a GET request.');
         // Get query params
-        const userId = context.req.query.userId;
         const ceteId = context.req.query.ceteId;
-        if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
+        if (typeof ceteId === 'undefined') {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
                 body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
                     message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
-                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID query parameter`
+                    error: `InvalidRequestNoCeteID : GET Request has no Cete ID`
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -44,7 +43,7 @@ const httpTrigger = function (context) {
             // Instantiate Blob Storage client and get data
             const blobClient = new BlobClient_1.default('cetes');
             try {
-                const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId);
+                const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(ceteId);
                 context.res = {
                     status: statuses_js_1.default.SUCCESS,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {

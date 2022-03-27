@@ -202,11 +202,10 @@ class StorageBlobClient {
     }
     /**
      * Downloads cete audioData from the WAV Blob using the filepath stored in the CosmosDB Indexing
-     * @param userId - id of user downloading the cete data
      * @param ceteId - id of cete data to be downloaded
      * @returns CeteDictWithData if successful, Error if failed
      */
-    downloadCeteFromWAVBlob(userId, ceteId) {
+    downloadCeteFromWAVBlob(ceteId) {
         return __awaiter(this, void 0, void 0, function* () {
             // Connect to Azure DB using the DBClient internal API
             const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
@@ -224,7 +223,7 @@ class StorageBlobClient {
                     ceteObj.setData(yield StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
                     // Set ceteObj fields
                     ceteObj.setIsArchived(response.getisArchived());
-                    ceteObj.setUserId(userId);
+                    ceteObj.setUserId(response.getUserId());
                     ceteObj.setCeteId(ceteId);
                     ceteObj.setTimestamp(response.getTimestamp());
                     ceteObj.setListens(response.getListens());
