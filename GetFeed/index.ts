@@ -10,6 +10,10 @@ import { AzureFunction, Context } from "@azure/functions";
 import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses";
 
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
+
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
     context.log('HTTP trigger function (v1/get/feed) is processing a GET request.');
@@ -23,7 +27,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/feed', 
-                { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }
+                { 
+                    message: `Failed to GET feed for user with userId ${userId}`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'

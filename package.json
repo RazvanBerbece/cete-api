@@ -7,7 +7,7 @@
     "build": "tsc",
     "lint": "npx eslint . --ext .ts",
     "test": "npx mocha dist/test/test_models/**/*.js",
-    "prep": "tsc & npx eslint . --ext .ts & npx mocha dist/test/test_models/**/*.js",
+    "prep": "npx eslint . --ext .ts; tsc; npx mocha dist/test/test_models/**/*.js",
     "start": "node --experimental-specifier-resolution=node dist/index.js"
   },
   "repository": {
@@ -28,7 +28,7 @@
     "@types/tedious": "^4.0.7",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
-    "eslint": "^8.11.0",
+    "eslint": "^8.12.0",
     "mocha": "^9.2.2",
     "typescript": "^4.6.3"
   },

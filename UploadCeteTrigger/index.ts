@@ -1,3 +1,8 @@
+/**
+ * Endpoint that triggers the storage of the JSON object attached in the body of the POST request
+ * in CosmosDB (Indexing - metadata) and Azure Storage (Blob - audio data)
+ */
+
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import Cete from "../models/Cete/Cete.js";
 import Response from "../models/Response/Response.js";
@@ -27,6 +32,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 new Date().toLocaleString(), 
                 'api/v1/upload/cete', 
                 { 
+                    message: `Server could not upload Cete metadata to database.`,
                     error: `InvalidRequestNoBody : POST Request has no body.` 
                 }
             ),
@@ -44,6 +50,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 new Date().toLocaleString(), 
                 'api/v1/upload/cete', 
                 { 
+                    message: `Server could not upload Cete metadata to database.`,
                     error: `InvalidRequestNoData : POST Request body has no data.` 
                 }
             ),
@@ -73,7 +80,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     new Date().toLocaleString(), 
                     'api/v1/upload/cete', 
                     { 
-                        error: `ServerDBError: Server could not upload Cete metadata to database. ${indexingOutput[1]}.`,
+                        message: `Server could not upload Cete metadata to database.`,
+                        error: indexingOutput[1],
                     }
                 ),
                 headers: {

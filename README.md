@@ -8,7 +8,9 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 # 1 Progress
 [~] Logic Models (~~Cete~~, User, Response, etc.)
 
-[~] Azure functions (Cete logic, User System logic, Security logic, etc.)
+[~] Azure functions (Cete, User System, etc.)
+
+[ ] Functions Security (Request Authorization, Auth)
 
 [~] CI/CD (testing, ~deployment~)
 
@@ -16,6 +18,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 
 # 2 Endpoints
 All REST responses for the URLs below carry a payload of type application/json.
+
 [x] GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
 
 [x] POST ```https://cete-api.azurewebsites.net/api/v1/upload/cete``` -> Post an audio file to the endpoint to store it in the Azure storage under userId (defaults to 'public' visibility).
@@ -28,7 +31,7 @@ All REST responses for the URLs below carry a payload of type application/json.
 
 [x] PUT ```https://cete-api.azurewebsites.net/api/v1/listen/cete``` -> Increments the 'listened' count of a Cete (with the given ceteId) upstream by 1. 
 
-[ ] DELETE ```https://cete-api.azurewebsites.net/api/v1/delete/cete``` -> Deletes a Cete (with the given ceteId) from upstream.
+[x] DELETE ```https://cete-api.azurewebsites.net/api/v1/delete/cete``` -> Deletes a Cete (with the given ceteId) from upstream.
 
 ## 2.1 Endpoints Request Templates
 1. POST ```api/v1/upload/cete```
@@ -68,7 +71,10 @@ The infrastructure is built using Azure Cloud and its resources.
 Implemented as IaC (Infrastructure as Code) using Terraform, the code can be easily maintained, modified and deployed to Azure Cloud and Terraform Cloud.
 ## 4.1 Server Hosting
 The Endpoints are hosted and executed as Azure functions. Azure provides reliable, scalable, serverless features for NodeJS projects. 
-Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'
+Each endpoint is deployed to Azure Function App and routed through ```api/v1/```. See '**2 Endpoints**' for each function and it's parameters & outputs. For sample request bodies, see '**2.1 Endpoints Request Templates**'.
+
+### Sample Azure Func creation command
+`func new --name AzureFuncName --template "HTTP trigger" --authlevel "anonymous"`
 ## 4.2 Data Storage
 Uses CosmosDB for metadata indexing. Actual audio data is stored in Azure Storage Containers within WAV-type Blobs.
 ## 4.3 Logging
@@ -81,7 +87,9 @@ See the CI workflow in ```.github/TestIntegrationFlow.yml```.
 
 ## 5.2 CD
 Uses GitHub Actions to run the npm scripts which will build the JS app out of the TypeScript source, lint and test the code. If the build is successful and the testing cases pass, the project folder will be deployed to the staging or production environment in Azure Function App automatically.
+
 See the CD staging workflow in ```.github/DeployStgAppToAzure.yml```.
+
 See the CD production workflow in ```.github/DeployPrdAppToAzure.yml```.
 
 # 6 Usage

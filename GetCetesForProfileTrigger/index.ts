@@ -1,7 +1,16 @@
+/**
+ * Endpoints that triggers the return of a list of profile-rendering-friendly Cete objects
+ * Includes metadata but no audio data in base64.
+ */
+
 import { AzureFunction, Context } from "@azure/functions";
 import Response from "../models/Response/Response.js";
 import StorageBlobClient from "../models/AzureBlobStorageClient/BlobClient";
 import STATUS_CODES from "../models/StatusCode/statuses.js";
+
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
@@ -18,7 +27,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/get/profile', 
-                { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }
+                { 
+                    message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -37,11 +49,14 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
 
         if (cetesDownloadResult instanceof Error) {
             context.res = {
-                status: STATUS_CODES.SERVER_GET_AUDIO_METADATA_FROM_UID_BLOB,
+                status: STATUS_CODES.SERVER_GET_CETES_FOR_PROFILE,
                 body: new Response(
                     new Date().toLocaleString(), 
                     'api/v1/get/profile', 
-                    { message: `ErrorGetProfileCetesFromUIDBlobs : ${cetesDownloadResult.message}. GET Request has downloaded no data.` }
+                    { 
+                        message: `Failed to GET Cetes for profile with userId ${userId}.`,
+                        error: cetesDownloadResult.message
+                    }
                 ),
                 headers: {
                     'Content-Type': 'application/json'
@@ -55,7 +70,7 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                     new Date().toLocaleString(), 
                     'api/v1/get/profile', 
                     { 
-                        message: `Downloaded ${cetesDownloadResult.length} cetes for user ${userId}`,
+                        message: `Downloaded ${cetesDownloadResult.length} Cetes for user ${userId}`,
                         data: cetesDownloadResult
                     }
                 ),

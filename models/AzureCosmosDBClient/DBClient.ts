@@ -51,29 +51,47 @@ class DBClient {
      */
     public updateCeteInCeteIndexing(updatedCete: Cete): Promise<CeteDictIndexing | Error> {
         return new Promise((resolve, reject) => {
-            this.container.item(updatedCete.getCeteId()).replace(updatedCete.getIndexingDict())
+            this.container.item(updatedCete.getCeteId(), updatedCete.getUserId()).replace(updatedCete.getIndexingDict())
             .then((result) => {
                 resolve(result.resource);
             })
             .catch((err) => {
-                reject(err);
+                reject(Error(`${err}. Could not update Cete in indexing`));
             });
         });
     }
 
     /**
      * Deletes an existing ceteObj from the indexing table
-     * @param ceteToDelete - Cete with existing ceteId to be deleted
+     * @param ceteId - Cete with ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    public deleteCeteFromCeteIndexing(ceteToDelete: Cete): Promise<string | Error> {
+    public deleteCeteFromCeteIndexing(ceteId: string): Promise<string | Error> {
         return new Promise((resolve, reject) => {
-            this.container.item(ceteToDelete.getCeteId()).delete()
-            .then((deleteOpResult) => {
-                // console.log(deleteOpResult)
-                resolve(deleteOpResult.item.id);
+            // Get Cete object from upstream (holds filepath and userId, which are necessary to delete the Blob in which the Cete is and for partitioning)
+            this.getCetefromCeteIndexing(ceteId)
+            .then((ceteFromUpstreamResult: Cete) => {
+                // Delete Blob which contains the audio data
+                const blobClient = new StorageBlobClient("cetes");
+                blobClient.deleteCeteBlob(ceteFromUpstreamResult)
+                .then(() => {
+                    // Delete Cete from indexing
+                    this.container.item(ceteId, ceteFromUpstreamResult.getUserId()).delete()
+                    .then(() => {
+                        resolve(ceteId);
+                    })
+                    .catch((err) => {
+                        // Failed to delete Cete from Indexing
+                        reject(err);
+                    });
+                })
+                .catch((err) => {
+                    // Failed to delete Blob with Cete audiodata
+                    reject(err);
+                });
             })
-            .catch((err) => {
+            .catch((err: Error) => {
+                // Failed to get Cete from Indexing
                 reject(err);
             });
         });
@@ -151,20 +169,27 @@ class DBClient {
             this.container.items.query(querySelectSpec).fetchAll()
             .then((result) => {
 
-                const ceteData = result.resources[0];
+                if (result.resources.length) {
+                    const ceteData = result.resources[0];
 
-                // Build Cete object from upstream
-                const cete = new Cete();
-                cete.setCeteId(ceteId);
-                cete.setTimestamp(ceteData.timestamp);
-                cete.setUserId(ceteData.userId);
-                cete.setIsArchived(ceteData.isArchived);
-                cete.setListens(ceteData.listens);
-                cete.setFilePath(ceteData.data.filepath)
+                    // Build Cete object from upstream
+                    const cete = new Cete();
+                    cete.setCeteId(ceteId);
+                    cete.setTimestamp(ceteData.timestamp);
+                    cete.setUserId(ceteData.userId);
+                    cete.setIsArchived(ceteData.isArchived);
+                    cete.setListens(ceteData.listens);
+                    cete.setFilePath(ceteData.data.filepath)
+    
+                    resolve(cete);
+                }
+                else {
+                    // 0 rows returned
+                    reject(Error(`Indexing database has no Cete with ceteId ${ceteId}`))
+                }
 
-                resolve(cete);
             })
-            .catch((err: Error) => {
+            .catch((err) => {
                 reject(err);
             });
         });
