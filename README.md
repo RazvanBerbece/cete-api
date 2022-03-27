@@ -17,7 +17,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 [~] Audio Data Processing (~~metadata storage~~, ~~audio data storage~~, retrieval from storage unit/s)
 
 # 2 Endpoints
-All REST responses for the URLs below carry a payload of type application/json.
+All REST responses for the URLs below carry a payload of type `application/json`.
 
 [x] GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
 
