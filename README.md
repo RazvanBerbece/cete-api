@@ -17,7 +17,7 @@ It uses the Cloud [cete-infrastructure](https://github.com/RazvanBerbece/cete-in
 [~] Audio Data Processing (~~metadata storage~~, ~~audio data storage~~, retrieval from storage unit/s)
 
 # 2 Endpoints
-All REST responses for the URLs below carry a payload of type application/json.
+All REST responses for the URLs below carry a payload of type `application/json`.
 
 [x] GET ```https://cete-api.azurewebsites.net/api/v1/``` -> Get a sample resposne from the server stating the port it's listening on.
 
@@ -94,4 +94,7 @@ See the CD production workflow in ```.github/DeployPrdAppToAzure.yml```.
 
 # 6 Usage
 In order to run the project locally, the dependencies have to be installed first (Node@x.y.z, the packages in package.json, package_lock.json, etc.).
+
 The ```dist/``` folder holds the transpiled TypeScript code which is actually run with the ```npm start``` command.
+
+Can also run `npm run prep` to bundle-run linting, transpiling and testing the npm package.
