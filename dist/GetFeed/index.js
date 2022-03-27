@@ -21,6 +21,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Response_js_1 = __importDefault(require("../models/Response/Response.js"));
 const statuses_1 = __importDefault(require("../models/StatusCode/statuses"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/get/feed) is processing a GET request.');
@@ -29,7 +32,10 @@ const httpTrigger = function (context) {
         if (typeof userId === 'undefined') {
             context.res = {
                 status: statuses_1.default.CLIENT_INVALID_REQUEST_NO_UID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/feed', { message: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/feed', {
+                    message: `Failed to GET feed for user with userId ${userId}`,
+                    error: `InvalidRequestNoUIDOrVisibility : GET Request has no UID or visibility query parameter`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }

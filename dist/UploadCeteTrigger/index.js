@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Endpoint that triggers the storage of the JSON object attached in the body of the POST request
+ * in CosmosDB (Indexing - metadata) and Azure Storage (Blob - audio data)
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -33,6 +37,7 @@ const httpTrigger = function (context, req) {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_BODY,
                 body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
+                    message: `Server could not upload Cete metadata to database.`,
                     error: `InvalidRequestNoBody : POST Request has no body.`
                 }),
                 headers: {
@@ -45,6 +50,7 @@ const httpTrigger = function (context, req) {
             context.res = {
                 status: statuses_js_1.default.CLIENT_INVALID_REQUEST_NO_DATA,
                 body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
+                    message: `Server could not upload Cete metadata to database.`,
                     error: `InvalidRequestNoData : POST Request body has no data.`
                 }),
                 headers: {
@@ -68,7 +74,8 @@ const httpTrigger = function (context, req) {
                 context.res = {
                     status: statuses_js_1.default.SERVER_DB_ERROR,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/upload/cete', {
-                        error: `ServerDBError: Server could not upload Cete metadata to database. ${indexingOutput[1]}.`,
+                        message: `Server could not upload Cete metadata to database.`,
+                        error: indexingOutput[1],
                     }),
                     headers: {
                         'Content-Type': 'application/json'

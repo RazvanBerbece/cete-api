@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Endpoint called to increment the number of listens of a Cete (when a 'listen' counts as legal)
+ * Endpoint that triggers the incrementing of the number of listens of a Cete (when a 'listen' counts as legal - Client / Frontend responsibility)
  * Updates Cete object in process and then in CosmosDB Indexing
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -20,6 +20,9 @@ const Response_js_1 = __importDefault(require("../models/Response/Response.js"))
 const statuses_1 = __importDefault(require("../models/StatusCode/statuses"));
 const DBClient_1 = __importDefault(require("../models/AzureCosmosDBClient/DBClient"));
 const Cete_js_1 = __importDefault(require("../models/Cete/Cete.js"));
+// Load environment variables
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const httpTrigger = function (context) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function (v1/listen/cete) is processing a PUT request.');
@@ -29,7 +32,10 @@ const httpTrigger = function (context) {
         if (typeof ceteId === 'undefined' || typeof userId === 'undefined') {
             context.res = {
                 status: statuses_1.default.CLIENT_INVALID_REQUEST_NO_CETEID_OR_PARAM,
-                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` }),
+                body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                    message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID`
+                }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -42,17 +48,8 @@ const httpTrigger = function (context) {
             ceteToBeListened.setUserId(userId);
             // Connect to Azure DB using the DBClient internal API
             const database_client = new DBClient_1.default(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
-            const resource = yield database_client.getCetefromCeteIndexing(ceteId);
-            if (resource instanceof Error) {
-                context.res = {
-                    status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `ServerListenCete : ${resource.message}. Cete did not update listens upstream.` }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                };
-            }
-            else {
+            try {
+                const resource = yield database_client.getCetefromCeteIndexing(ceteId);
                 // Continue building Cete object with data from upstream to match update target format
                 ceteToBeListened.setTimestamp(resource.getTimestamp());
                 ceteToBeListened.setFilePath(resource.getFilePath());
@@ -60,25 +57,44 @@ const httpTrigger = function (context) {
                 ceteToBeListened.setListens(resource.getListens());
                 ceteToBeListened.incrementListens();
                 // Update object upstream
-                const listenedResource = yield database_client.updateCeteInCeteIndexing(ceteToBeListened);
-                if (listenedResource instanceof Error) {
-                    context.res = {
-                        status: statuses_1.default.SERVER_LISTEN_AUDIO,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `ServerListenCete : ${listenedResource.message}. Cete did not update listens upstream.` }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    };
-                }
-                else {
+                try {
+                    const listenedResource = yield database_client.updateCeteInCeteIndexing(ceteToBeListened);
+                    console.log("GOT HERE M3");
                     context.res = {
                         status: statuses_1.default.SUCCESS,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', { message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` }),
+                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                            message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}`
+                        }),
                         headers: {
                             'Content-Type': 'application/json'
                         }
                     };
                 }
+                catch (err) {
+                    console.log("GOT HERE M1");
+                    context.res = {
+                        status: statuses_1.default.SERVER_LISTEN_AUDIO,
+                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                            message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                            error: err.message
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                }
+            }
+            catch (err) {
+                context.res = {
+                    status: statuses_1.default.SERVER_LISTEN_AUDIO,
+                    body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
+                        message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                        error: err.message
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
             }
         }
     });

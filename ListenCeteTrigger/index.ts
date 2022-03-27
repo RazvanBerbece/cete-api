@@ -1,5 +1,5 @@
 /**
- * Endpoint called to increment the number of listens of a Cete (when a 'listen' counts as legal)
+ * Endpoint that triggers the incrementing of the number of listens of a Cete (when a 'listen' counts as legal - Client / Frontend responsibility)
  * Updates Cete object in process and then in CosmosDB Indexing
  */
 
@@ -8,6 +8,11 @@ import Response from "../models/Response/Response.js";
 import STATUS_CODES from "../models/StatusCode/statuses";
 import DBClient from "../models/AzureCosmosDBClient/DBClient";
 import Cete from "../models/Cete/Cete.js";
+
+// Load environment variables
+import dotenv from "dotenv";
+import { CeteDictIndexing } from "../models/Cete/CeteTypes.js";
+dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
 
@@ -23,7 +28,10 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
             body: new Response(
                 new Date().toLocaleString(), 
                 'api/v1/listen/cete', 
-                { message: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` }
+                { 
+                    message: `Failed to register listen for cete with ceteId ${ceteId}`,
+                    error: `InvalidRequestNoCeteOrUserID : GET Request has no Cete ID or user ID` 
+                }
             ),
             headers: {
                 'Content-Type': 'application/json'
@@ -40,59 +48,69 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
         // Connect to Azure DB using the DBClient internal API
         const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
-        const resource = await database_client.getCetefromCeteIndexing(ceteId);
-        if (resource instanceof Error) {
-            context.res = {
-                status: STATUS_CODES.SERVER_LISTEN_AUDIO,
-                body: new Response(
-                    new Date().toLocaleString(), 
-                    'api/v1/listen/cete', 
-                    { message: `ServerListenCete : ${resource.message}. Cete did not update listens upstream.` }
-                ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };  
-        }
-        else {
+        try {
 
+            const resource = await database_client.getCetefromCeteIndexing(ceteId);
+            
             // Continue building Cete object with data from upstream to match update target format
-            ceteToBeListened.setTimestamp(resource.getTimestamp());
-            ceteToBeListened.setFilePath(resource.getFilePath());
+            ceteToBeListened.setTimestamp((resource as Cete).getTimestamp());
+            ceteToBeListened.setFilePath((resource as Cete).getFilePath());
 
             // Download current listen count from upstream & increment
-            ceteToBeListened.setListens(resource.getListens());
+            ceteToBeListened.setListens((resource as Cete).getListens());
             ceteToBeListened.incrementListens();
 
             // Update object upstream
-            const listenedResource = await database_client.updateCeteInCeteIndexing(ceteToBeListened)
-            if (listenedResource instanceof Error) {
-                context.res = {
-                    status: STATUS_CODES.SERVER_LISTEN_AUDIO,
-                    body: new Response(
-                        new Date().toLocaleString(), 
-                        'api/v1/listen/cete', 
-                        { message: `ServerListenCete : ${listenedResource.message}. Cete did not update listens upstream.` }
-                    ),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }; 
-            }
-            else {
+            try {
+                const listenedResource = await database_client.updateCeteInCeteIndexing(ceteToBeListened);
+                console.log("GOT HERE M3");
                 context.res = {
                     status: STATUS_CODES.SUCCESS,
                     body: new Response(
                         new Date().toLocaleString(), 
                         'api/v1/listen/cete', 
-                        { message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}` }
+                        { 
+                            message: `Successfully registered listen for Cete ${(listenedResource as CeteDictIndexing).id}. New 'listened' count is ${(listenedResource as CeteDictIndexing).listens}` 
+                        }
                     ),
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 };
             }
-
+            catch (err) {
+                console.log("GOT HERE M1");
+                context.res = {
+                    status: STATUS_CODES.SERVER_LISTEN_AUDIO,
+                    body: new Response(
+                        new Date().toLocaleString(), 
+                        'api/v1/listen/cete', 
+                        { 
+                            message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                            error: err.message
+                        }
+                    ),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }; 
+            }
+        }
+        catch (err) {
+            context.res = {
+                status: STATUS_CODES.SERVER_LISTEN_AUDIO,
+                body: new Response(
+                    new Date().toLocaleString(), 
+                    'api/v1/listen/cete', 
+                    { 
+                        message: `Failed to register listen for Cete with ceteId ${ceteId}`,
+                        error: err.message
+                    }
+                ),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };  
         }
 
     }

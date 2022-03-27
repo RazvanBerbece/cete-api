@@ -41,10 +41,10 @@ class StorageBlobClient {
      */
     public async uploadCeteToWAVBlob(cete: Cete): Promise<1 | Error> {
 
-        // Create blob name
+        // Get filepath from cete object. Use filepath as a Blob name.
         const blobName = cete.getFilePath();
         if (blobName == "NaN") {
-            return Error("Cete does not have a filepath.");
+            return Error("Cete does not have a filepath set");
         }
 
         // Get a block blob client
@@ -61,6 +61,31 @@ class StorageBlobClient {
 
         // TODO: Maybe return processed thumbnail ? (if done on server-side)
         return 1;
+
+    }
+
+    /**
+     * Deletes all records of the given Cete object from the upstreadm databases
+     * @param cete - Cete object to be deleted from all storage
+     * @returns 1 if successful, error if not
+     */
+    public async deleteCeteBlob(cete: Cete): Promise<1 | Error> {
+
+        // Get filepath from cete object. Use filepath as Blob name for Blob to be deleted..
+        const blobName = cete.getFilePath();
+        if (blobName == "NaN") {
+            throw Error("Cete does not have a filepath set");
+        }
+
+        // Get the block blob client for the blobName and delete it
+        try {
+            const blobDeleteResponse = await this.blobContainerClient.deleteBlob(blobName);
+            console.log(blobDeleteResponse);
+            return 1;
+        }
+        catch (err) {
+            throw Error(err);
+        }
 
     }
 
@@ -148,7 +173,7 @@ class StorageBlobClient {
             }
         }
         catch (err) {
-            return Error(`${err}`);
+            return Error(err);
         }
 
     }
@@ -160,47 +185,44 @@ class StorageBlobClient {
      * @returns CeteDictWithData if successful, Error if failed
      */
     public async downloadCeteFromWAVBlob(userId: string, ceteId: string): Promise<CeteDictWithData | Error> {
-        return new Promise((resolve, reject) => {
-            try {
+    
+        // Connect to Azure DB using the DBClient internal API
+        const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
 
-                let filepath: string;
+        try {
     
-                // Connect to Azure DB using the DBClient internal API
-                const database_client = new DBClient(`cete-${process.env["ENVIRONMENT"]}-indexing`, "Cetes");
+            // Get Cete Filepath & timestamp from indexing
+            const response = await database_client.getCetefromCeteIndexing(ceteId);
+
+            if (response instanceof Cete) {
+
+                const filepath = response.getFilePath();
+                
+                // Populate a Cete object to be added to the list of objects
+                const ceteObj = new Cete();
     
-                // Get Cete Filepath & timestamp from indexing
-                database_client.getCetefromCeteIndexing(ceteId)
-                .then(async (response: Cete) => {
+                // Get a block blob client for current blob in iteration & download
+                const blockBlobClient = this.blobContainerClient.getBlockBlobClient(filepath);
+                const downloadBlockBlobResponse = await blockBlobClient.download(0);
     
-                    filepath = response.getFilePath();
-                    
-                    // Populate a Cete object to be added to the list of objects
-                    const ceteObj = new Cete();
+                // Set data of the ceteObj with the string streamed from the .download() result
+                ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
     
-                    // Get a block blob client for current blob in iteration & download
-                    const blockBlobClient = this.blobContainerClient.getBlockBlobClient(filepath);
-                    const downloadBlockBlobResponse = await blockBlobClient.download(0);
-    
-                    // Set data of the ceteObj with the string streamed from the .download() result
-                    ceteObj.setData(await StorageBlobClient.streamToString(downloadBlockBlobResponse.readableStreamBody));
-    
-                    // Set ceteObj fields
-                    ceteObj.setIsArchived(response.getisArchived());
-                    ceteObj.setUserId(userId);
-                    ceteObj.setCeteId(ceteId);
-                    ceteObj.setTimestamp(response.getTimestamp());
-                    ceteObj.setListens(response.getListens());
-                    
-                    resolve(ceteObj.getCeteDictWithData());
-                })
-                .catch((err) => {
-                    reject(Error(`ErrorGetCeteFromIndexing : ${err} ~> Failed to get metadata for cete with id ${ceteId}`));
-                });
+                // Set ceteObj fields
+                ceteObj.setIsArchived(response.getisArchived());
+                ceteObj.setUserId(userId);
+                ceteObj.setCeteId(ceteId);
+                ceteObj.setTimestamp(response.getTimestamp());
+                ceteObj.setListens(response.getListens());
+                
+                return Promise.resolve(ceteObj.getCeteDictWithData());
+
             }
-            catch (err) {
-                reject(Error(`${err}`));
-            }
-        });
+
+        }
+        catch (err) {
+            return Promise.reject(Error(`${err.message}. Could not retrieve Cete from indexing database`));
+        }
     }
 
     /**
