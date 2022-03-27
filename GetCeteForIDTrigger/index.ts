@@ -39,24 +39,8 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
     else {    
         // Instantiate Blob Storage client and get data
         const blobClient = new StorageBlobClient('cetes');
-        const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(userId, ceteId);
-        if (ceteDownloadResult instanceof Error) {
-            context.res = {
-                status: STATUS_CODES.SERVER_GET_AUDIO_DATA_FROM_BLOB,
-                body: new Response(
-                    new Date().toLocaleString(), 
-                    'api/v1/get/cete', 
-                    { 
-                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
-                        error: ceteDownloadResult.message
-                    }
-                ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }; 
-        }
-        else {
+        try {
+            const ceteDownloadResult = await blobClient.downloadCeteFromWAVBlob(userId, ceteId);
             context.res = {
                 status: STATUS_CODES.SUCCESS,
                 body: new Response(
@@ -72,7 +56,22 @@ const httpTrigger: AzureFunction = async function (context: Context): Promise<vo
                 }
             };
         }
-
+        catch (err) {
+            context.res = {
+                status: STATUS_CODES.SERVER_GET_AUDIO_DATA_FROM_BLOB,
+                body: new Response(
+                    new Date().toLocaleString(), 
+                    'api/v1/get/cete', 
+                    { 
+                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                        error: err.message
+                    }
+                ),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }; 
+        }
     }
 
 };

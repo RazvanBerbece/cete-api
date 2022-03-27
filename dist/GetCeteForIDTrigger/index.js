@@ -43,25 +43,25 @@ const httpTrigger = function (context) {
         else {
             // Instantiate Blob Storage client and get data
             const blobClient = new BlobClient_1.default('cetes');
-            const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId);
-            if (ceteDownloadResult instanceof Error) {
+            try {
+                const ceteDownloadResult = yield blobClient.downloadCeteFromWAVBlob(userId, ceteId);
                 context.res = {
-                    status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
+                    status: statuses_js_1.default.SUCCESS,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
-                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
-                        error: ceteDownloadResult.message
+                        message: `Downloaded cete data for cete with id ${ceteId}`,
+                        data: ceteDownloadResult
                     }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 };
             }
-            else {
+            catch (err) {
                 context.res = {
-                    status: statuses_js_1.default.SUCCESS,
+                    status: statuses_js_1.default.SERVER_GET_AUDIO_DATA_FROM_BLOB,
                     body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/get/cete', {
-                        message: `Downloaded cete data for cete with id ${ceteId}`,
-                        data: ceteDownloadResult
+                        message: `Failed to GET detailed Cete with ceteId ${ceteId}.`,
+                        error: err.message
                     }),
                     headers: {
                         'Content-Type': 'application/json'

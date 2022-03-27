@@ -66,34 +66,42 @@ class DBClient {
      * @param ceteId - Cete with ceteId to be deleted
      * @returns void, err if error occurs while deleting the Cete
      */
-    public async deleteCeteFromCeteIndexing(ceteId: string): Promise<string | Error> {
-        try {
+    public deleteCeteFromCeteIndexing(ceteId: string): Promise<string | Error> {
+        return new Promise((resolve, reject) => {
             console.log("GOT HERE 1");
-            
-            const { resource: result } = await this.container.item(ceteId).delete();
-    
-            console.log("GOT HERE 2");
-    
-            const ceteFromUpstreamResult = await this.getCetefromCeteIndexing(ceteId);
-            if (ceteFromUpstreamResult instanceof Error) {
-                console.log("GOT HERE 3");
-                return Promise.reject<Error>(ceteFromUpstreamResult);
-            }
-            else {
-                // Delete blob which contains the audio data
-                console.log("GOT HERE 4");
-                const blobClient = new StorageBlobClient("cetes");
-                const deleteOpStatus = await blobClient.deleteCeteBlob(ceteFromUpstreamResult);
-                if (deleteOpStatus != 1) {
-                    return Promise.reject<Error>(deleteOpStatus);
-                }
-                console.log("GOT HERE 5");
-                return Promise.resolve<string>(ceteId);
-            }
-        }
-        catch (err) {
-            return Promise.reject<Error>(err);
-        } 
+            this.container.item(ceteId).delete()
+            .then(() => {
+                console.log("GOT HERE 2");
+                // Get Cete object from upstream (holds filepath, which is needed to delete the Blob in which the Cete is)
+                this.getCetefromCeteIndexing(ceteId)
+                .then((ceteFromUpstreamResult: Cete) => {
+                    console.log("GOT HERE 3");
+                    // Delete blob which contains the audio data
+                    const blobClient = new StorageBlobClient("cetes");
+                    blobClient.deleteCeteBlob(ceteFromUpstreamResult)
+                    .then((deleteOpStatus) => {
+                        console.log("GOT HERE 4");
+                        if (deleteOpStatus != 1) {
+                            console.log("GOT HERE 44");
+                            reject(deleteOpStatus);
+                        }
+                        resolve(ceteId);
+                    })
+                    .catch((err) => {
+                        console.log("GOT HERE 33");
+                        reject(err);
+                    });
+                })
+                .catch((err: Error) => {
+                    console.log("GOT HERE 22");
+                    reject(err);
+                });
+            })
+            .catch((err) => {
+                console.log("GOT HERE 11");
+                reject(err);
+            });
+        });
     }
 
     /**
@@ -168,20 +176,27 @@ class DBClient {
             this.container.items.query(querySelectSpec).fetchAll()
             .then((result) => {
 
-                const ceteData = result.resources[0];
+                if (result.resources.length) {
+                    const ceteData = result.resources[0];
 
-                // Build Cete object from upstream
-                const cete = new Cete();
-                cete.setCeteId(ceteId);
-                cete.setTimestamp(ceteData.timestamp);
-                cete.setUserId(ceteData.userId);
-                cete.setIsArchived(ceteData.isArchived);
-                cete.setListens(ceteData.listens);
-                cete.setFilePath(ceteData.data.filepath)
+                    // Build Cete object from upstream
+                    const cete = new Cete();
+                    cete.setCeteId(ceteId);
+                    cete.setTimestamp(ceteData.timestamp);
+                    cete.setUserId(ceteData.userId);
+                    cete.setIsArchived(ceteData.isArchived);
+                    cete.setListens(ceteData.listens);
+                    cete.setFilePath(ceteData.data.filepath)
+    
+                    resolve(cete);
+                }
+                else {
+                    // 0 rows returned
+                    reject(Error(`Indexing database has no Cete with ceteId ${ceteId}`))
+                }
 
-                resolve(cete);
             })
-            .catch((err: Error) => {
+            .catch((err) => {
                 reject(err);
             });
         });
