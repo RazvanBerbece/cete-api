@@ -73,16 +73,10 @@ const httpTrigger = function (context) {
                 catch (err) {
                     console.log("GOT HERE M1");
                     context.res = {
-<<<<<<< HEAD
                         status: statuses_1.default.SERVER_LISTEN_AUDIO,
                         body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
                             message: `Failed to register listen for Cete with ceteId ${ceteId}`,
                             error: err.message
-=======
-                        status: statuses_1.default.SUCCESS,
-                        body: new Response_js_1.default(new Date().toLocaleString(), 'api/v1/listen/cete', {
-                            message: `Successfully registered listen for Cete ${listenedResource.id}. New 'listened' count is ${listenedResource.listens}`
->>>>>>> 3c3ec7f (IMPLEMENT DeleteCeteTrigger)
                         }),
                         headers: {
                             'Content-Type': 'application/json'

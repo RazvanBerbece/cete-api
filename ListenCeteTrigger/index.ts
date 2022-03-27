@@ -12,7 +12,6 @@ import Cete from "../models/Cete/Cete.js";
 
 // Load environment variables
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const httpTrigger: AzureFunction = async function (context: Context): Promise<void> {
